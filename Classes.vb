@@ -297,8 +297,8 @@ Public Class CCharArmoredArmadillo
                 ElseIf FDir = FaceDir.Left Then
                     PosX = PosX + Vx
                     PosY = PosY + Vy
-                    If PosX <= 45 Then
-                        PosX = 46
+                    If PosX <= 30 Then
+                        PosX = 31
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -316,8 +316,8 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
 
-                    ElseIf PosY <= 50 Then
-                        PosY = 51
+                    ElseIf PosY <= 30 Then
+                        PosY = 31
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 240
@@ -345,8 +345,8 @@ Public Class CCharArmoredArmadillo
                 ElseIf FDir = FaceDir.Right Then
                     PosX = PosX + Vx
                     PosY = PosY + Vy
-                    If PosX >= 290 Then
-                        PosX = 289
+                    If PosX >= 310 Then
+                        PosX = 309
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -364,8 +364,8 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
 
-                    ElseIf PosY <= 50 Then
-                        PosY = 51
+                    ElseIf PosY <= 30 Then
+                        PosY = 31
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 330
