@@ -273,10 +273,14 @@ Public Class CCharArmoredArmadillo
                 Vy = Vy + gravity
                 GetNextFrame()
                 If PosY >= 238 And Vy > 0 Then
+                    Vy = 0
                     State(StateArmoredArmadillo.Rolling, 9)
                     PosY = 238
-                    Vx = 0
-                    Vy = 0
+                    If FDir = FaceDir.Left Then
+                        Vx = -10
+                    Else
+                        Vx = 10
+                    End If
                     wallbangCounter = 0
                 End If
 
@@ -289,22 +293,101 @@ Public Class CCharArmoredArmadillo
                         Vy = -10
                         State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                     End If
+
                 ElseIf FDir = FaceDir.Left Then
-                    Vx = -10
                     PosX = PosX + Vx
+                    PosY = PosY + Vy
                     If PosX <= 45 Then
-                        Vx *= -1
+                        PosX = 46
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        If Vy <= 0 Then
+                            upperBoundAngle = 60
+                            lowerBoundAngle = 30
+                        Else
+                            upperBoundAngle = 330
+                            lowerBoundAngle = 300
+                        End If
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
-                        wallbangCounter = wallbangCounter + 1
+
+                    ElseIf PosY <= 50 Then
+                        PosY = 51
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 240
+                        lowerBoundAngle = 210
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
+                    ElseIf PosY >= 250 Then
+                        PosY = 249
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 150
+                        lowerBoundAngle = 120
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
                     End If
 
                 ElseIf FDir = FaceDir.Right Then
-                    Vx = 10
                     PosX = PosX + Vx
-                    If PosX >= 300 Then
-                        Vx *= -1
+                    PosY = PosY + Vy
+                    If PosX >= 290 Then
+                        PosX = 289
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        If Vy <= 0 Then
+                            upperBoundAngle = 150
+                            lowerBoundAngle = 120
+                        Else
+                            upperBoundAngle = 240
+                            lowerBoundAngle = 210
+                        End If
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
-                        wallbangCounter = wallbangCounter + 1
+
+                    ElseIf PosY <= 50 Then
+                        PosY = 51
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 330
+                        lowerBoundAngle = 300
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
+                    ElseIf PosY >= 250 Then
+                        PosY = 249
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 60
+                        lowerBoundAngle = 30
+                        ' Generate random value between the two angle
+                        Dim rnd As New Random()
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
                     End If
 
                     If wallbangCounter >= 3 Then
@@ -342,8 +425,8 @@ Public Class CCharArmoredArmadillo
                     If isIntro Then
                         isIntro = False
                         State(StateArmoredArmadillo.IntroAnimation, 2)
-                    Else
-                        State(StateArmoredArmadillo.StandArmored, 0)
+                        'Else
+                        '    State(StateArmoredArmadillo.StandArmored, 0)
                     End If
                     isInRollingAnimation = False
                 End If

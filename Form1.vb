@@ -29,6 +29,7 @@ Public Class Form1
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         'open image for background, assign to bg
 
+        ' Initialize the random-number generator.
         Randomize()
 
         Bg = New CImage
@@ -111,7 +112,7 @@ Public Class Form1
         SM.ArrSprites(11) = AA_RollingRecoveryEndArmored
 
         SM.PosX = 280
-        SM.PosY = 50
+        SM.PosY = 70
         SM.Vx = 0
         SM.Vy = 10
         SM.State(StateArmoredArmadillo.Rolling, 9)
