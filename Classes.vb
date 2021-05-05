@@ -11,6 +11,7 @@ Public Enum StateArmoredArmadillo
     Rolling
     RollingRecoveryArmored
     RollingRecoveryEndArmored
+    FreeFalling
 End Enum
 
 Public Enum StateArmoredArmadilloProjectile
@@ -176,6 +177,7 @@ Public Class CCharArmoredArmadillo
     Public isShooting As Boolean = False
     Public isInRollingAnimation As Boolean = False
     Public isIntro As Boolean = True
+    Public isFreeFalling As Boolean = False
     Public wallbangCounter As Integer
     Public CurrState As StateArmoredArmadillo
 
@@ -316,7 +318,7 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
 
                     ElseIf PosY <= 30 Then
@@ -331,7 +333,7 @@ Public Class CCharArmoredArmadillo
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
                     ElseIf PosY >= 250 Then
                         PosY = 249
@@ -345,7 +347,7 @@ Public Class CCharArmoredArmadillo
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
                     End If
 
@@ -370,7 +372,7 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
 
                     ElseIf PosY <= 30 Then
@@ -385,7 +387,7 @@ Public Class CCharArmoredArmadillo
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
                     ElseIf PosY >= 250 Then
                         PosY = 249
@@ -399,29 +401,94 @@ Public Class CCharArmoredArmadillo
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
-                            State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                            State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
+                    End If
+                End If
+
+            Case StateArmoredArmadillo.FreeFalling
+                Dim rnd As New Random()
+                GetNextFrame()
+                If PosY >= 250 Then
+                    PosY = 238
+                    Vy = -10
+                    Vx = 0
+                    State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
+                End If
+
+                If FDir = FaceDir.Left Then
+                    PosX = PosX + Vx
+                    PosY = PosY + Vy
+                    Vy = Vy + gravity
+                    If PosX <= 30 Then
+                        PosX = 31
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        If Vy <= 0 Then
+                            upperBoundAngle = 60
+                            lowerBoundAngle = 30
+                        Else
+                            upperBoundAngle = 330
+                            lowerBoundAngle = 300
+                        End If
+                        ' Generate random value between the two angle
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
+                        FDir = FaceDir.Right
+
+                    ElseIf PosY <= 30 Then
+                        PosY = 31
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 240
+                        lowerBoundAngle = 210
+                        ' Generate random value between the two angle
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
+                    End If
+
+                ElseIf FDir = FaceDir.Right Then
+                    PosX = PosX + Vx
+                    PosY = PosY + Vy
+                    Vy = Vy + gravity
+                    If PosX >= 310 Then
+                        PosX = 309
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        If Vy <= 0 Then
+                            upperBoundAngle = 150
+                            lowerBoundAngle = 120
+                        Else
+                            upperBoundAngle = 240
+                            lowerBoundAngle = 210
+                        End If
+                        ' Generate random value between the two angle
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
+                        FDir = FaceDir.Left
+
+                    ElseIf PosY <= 30 Then
+                        PosY = 31
+
+                        Dim lowerBoundAngle, upperBoundAngle As Integer
+                        upperBoundAngle = 330
+                        lowerBoundAngle = 300
+                        ' Generate random value between the two angle
+                        Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Vx = Velocity(0)
+                        Vy = Velocity(1) * -1
                     End If
                 End If
 
             Case StateArmoredArmadillo.RollingRecoveryArmored
                 GetNextFrame()
-                'If PosY <= 50 Then
-                '    Vy = 0
-                '    PosY = 51
-                'End If
-                'If PosY >= 239 Then
-                '    Vy = 0
-                '    PosY = 238
-                'End If
-                'If PosX <= 45 Then
-                '    Vx = 0
-                '    PosX = 46
-                'End If
-                'If PosX >= 290 Then
-                '    Vx = 0
-                '    PosX = 289
-                'End If
                 If FrameIdx = 6 Or PosY >= 238 Then
                     State(StateArmoredArmadillo.RollingRecoveryEndArmored, 11)
                 End If
@@ -442,22 +509,6 @@ Public Class CCharArmoredArmadillo
                     isInRollingAnimation = False
                 End If
                 GetNextFrame()
-                If PosY <= 50 Then
-                    Vy = 0
-                    PosY = 51
-                End If
-                If PosY >= 239 Then
-                    Vy = 0
-                    PosY = 238
-                End If
-                If PosX <= 45 Then
-                    Vx = 0
-                    PosX = 46
-                End If
-                If PosX >= 290 Then
-                    Vx = 0
-                    PosX = 289
-                End If
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 Vy = Vy + gravity
