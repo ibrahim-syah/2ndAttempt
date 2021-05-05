@@ -17,6 +17,7 @@ End Enum
 Public Enum StateArmoredArmadilloProjectile
     Create
     Horizontal
+    Hit
 End Enum
 
 
@@ -544,13 +545,19 @@ Public Class CCharArmoredArmadilloProjectile
                 GetNextFrame()
                 PosX = PosX + Vx
                 If PosX >= 320 Or PosX <= 20 Then
-                    Destroy = True
+                    State(StateArmoredArmadilloProjectile.Hit, 2)
                 End If
                 If FDir = FaceDir.Left Then
                     Vx = -6
                 Else
                     Vx = 6
                 End If
+
+            Case StateArmoredArmadilloProjectile.Hit
+                If FrameIdx = 3 And CurrFrame = 1 Then
+                    Destroy = True
+                End If
+                GetNextFrame()
 
         End Select
     End Sub

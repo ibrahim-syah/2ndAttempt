@@ -19,9 +19,9 @@ Public Class Form1
         AA_Rolling,
         AA_RollingRecoveryArmored,
         AA_RollingRecoveryEndArmored As CArrFrame
-    Dim AA_ProjCreate1, AA_ProjHorizontal As CArrFrame
+    Dim AA_ProjCreate1, AA_ProjHorizontal, AA_ProjHit As CArrFrame
     Dim ListChar As New List(Of CCharacter)
-    Dim SM As CCharArmoredArmadillo
+    Dim AA As CCharArmoredArmadillo
 
 
 
@@ -96,29 +96,29 @@ Public Class Form1
         AA_RollingRecoveryEndArmored = New CArrFrame
         AA_RollingRecoveryEndArmored.Insert(315, 22, 293, 3, 338, 55, 5)
 
-        SM = New CCharArmoredArmadillo
-        ReDim SM.ArrSprites(11)
-        SM.ArrSprites(0) = AA_StandArmored
-        SM.ArrSprites(1) = AA_WalkDebug
-        SM.ArrSprites(2) = AA_IntroAnimation
-        SM.ArrSprites(3) = AA_Guard
-        SM.ArrSprites(4) = AA_ShootArmored
+        AA = New CCharArmoredArmadillo
+        ReDim AA.ArrSprites(11)
+        AA.ArrSprites(0) = AA_StandArmored
+        AA.ArrSprites(1) = AA_WalkDebug
+        AA.ArrSprites(2) = AA_IntroAnimation
+        AA.ArrSprites(3) = AA_Guard
+        AA.ArrSprites(4) = AA_ShootArmored
         '5 is missing
-        SM.ArrSprites(6) = AA_JumpStartArmored
-        SM.ArrSprites(7) = AA_JumpArmored
-        SM.ArrSprites(8) = AA_JumpEndArmored
-        SM.ArrSprites(9) = AA_Rolling
-        SM.ArrSprites(10) = AA_RollingRecoveryArmored
-        SM.ArrSprites(11) = AA_RollingRecoveryEndArmored
+        AA.ArrSprites(6) = AA_JumpStartArmored
+        AA.ArrSprites(7) = AA_JumpArmored
+        AA.ArrSprites(8) = AA_JumpEndArmored
+        AA.ArrSprites(9) = AA_Rolling
+        AA.ArrSprites(10) = AA_RollingRecoveryArmored
+        AA.ArrSprites(11) = AA_RollingRecoveryEndArmored
 
-        SM.PosX = 280
-        SM.PosY = 70
-        SM.Vx = 0
-        SM.Vy = 10
-        SM.State(StateArmoredArmadillo.Rolling, 9)
-        SM.FDir = FaceDir.Left
+        AA.PosX = 280
+        AA.PosY = 70
+        AA.Vx = 0
+        AA.Vy = 10
+        AA.State(StateArmoredArmadillo.Rolling, 9)
+        AA.FDir = FaceDir.Left
 
-        ListChar.Add(SM)
+        ListChar.Add(AA)
 
         'initialize sprites for Sprite Projectiles
         AA_ProjCreate1 = New CArrFrame
@@ -131,6 +131,12 @@ Public Class Form1
         AA_ProjHorizontal.Insert(384, 81, 377, 73, 395, 88, 1)
         AA_ProjHorizontal.Insert(406, 81, 399, 73, 419, 88, 1)
         AA_ProjHorizontal.Insert(363, 82, 356, 73, 372, 90, 1)
+
+        AA_ProjHit = New CArrFrame
+        AA_ProjHit.Insert(346, 81, 339, 75, 352, 88, 1)
+        AA_ProjHit.Insert(329, 81, 321, 73, 336, 88, 1)
+        AA_ProjHit.Insert(346, 81, 339, 75, 352, 88, 1)
+        AA_ProjHit.Insert(308, 81, 300, 72, 316, 89, 2)
 
         'TODO: add on hit sprite
 
@@ -315,7 +321,7 @@ Public Class Form1
 
         Next
 
-        If SM.CurrState = StateArmoredArmadillo.ShootArmored And SM.CurrFrame = 2 Then
+        If AA.CurrState = StateArmoredArmadillo.ShootArmored And AA.CurrFrame = 2 Then
             CreateArmoredArmadilloProjectile(1)
         End If
 
@@ -337,15 +343,15 @@ Public Class Form1
         Dim SP As CCharArmoredArmadilloProjectile
 
         SP = New CCharArmoredArmadilloProjectile
-        If SM.FDir = FaceDir.Left Then
-            SP.PosX = SM.PosX - 20
+        If AA.FDir = FaceDir.Left Then
+            SP.PosX = AA.PosX - 20
             SP.FDir = FaceDir.Left
         Else
-            SP.PosX = SM.PosX + 20
+            SP.PosX = AA.PosX + 20
             SP.FDir = FaceDir.Right
         End If
 
-        SP.PosY = SM.PosY - 10
+        SP.PosY = AA.PosY - 10
 
         SP.Vx = 0
         SP.Vy = 0
@@ -355,30 +361,31 @@ Public Class Form1
             SP.ArrSprites(0) = AA_ProjCreate1
         End If
         SP.ArrSprites(1) = AA_ProjHorizontal
+        SP.ArrSprites(2) = AA_ProjHit
 
         ListChar.Add(SP)
     End Sub
 
     Private Sub ArmoredArmadillo_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        If e.KeyCode = Keys.Left And SM.CurrState = StateArmoredArmadillo.StandArmored Then
-            SM.isWalking = True
-            SM.FDir = FaceDir.Left
-        ElseIf e.KeyCode = Keys.Right And SM.CurrState = StateArmoredArmadillo.StandArmored Then
-            SM.isWalking = True
-            SM.FDir = FaceDir.Right
-        ElseIf e.KeyCode = Keys.Down And SM.CurrState = StateArmoredArmadillo.StandArmored Then
-            SM.isGuarding = True
-        ElseIf e.KeyCode = Keys.S And SM.CurrState = StateArmoredArmadillo.StandArmored Then
-            SM.isShooting = True
-        ElseIf e.KeyCode = Keys.Space And SM.CurrState = StateArmoredArmadillo.StandArmored Then
-            SM.isInRollingAnimation = True
+        If e.KeyCode = Keys.Left And AA.CurrState = StateArmoredArmadillo.StandArmored Then
+            AA.isWalking = True
+            AA.FDir = FaceDir.Left
+        ElseIf e.KeyCode = Keys.Right And AA.CurrState = StateArmoredArmadillo.StandArmored Then
+            AA.isWalking = True
+            AA.FDir = FaceDir.Right
+        ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.StandArmored Then
+            AA.isGuarding = True
+        ElseIf e.KeyCode = Keys.S And AA.CurrState = StateArmoredArmadillo.StandArmored Then
+            AA.isShooting = True
+        ElseIf e.KeyCode = Keys.Space And AA.CurrState = StateArmoredArmadillo.StandArmored Then
+            AA.isInRollingAnimation = True
         End If
     End Sub
 
     Private Sub ArmoredArmadillo_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
 
         If e.KeyCode = Keys.Down Then
-            SM.isGuarding = False
+            AA.isGuarding = False
         End If
     End Sub
 
