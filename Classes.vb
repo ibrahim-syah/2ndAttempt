@@ -14,6 +14,16 @@ Public Enum StateArmoredArmadillo
     FreeFalling
 End Enum
 
+Public Enum StateMegaman
+    Spawn
+    Run
+    Shoot
+    Staggered
+    JumpStart
+    Jump
+    JumpEnd
+End Enum
+
 Public Enum StateArmoredArmadilloProjectile
     Create
     Horizontal
@@ -163,7 +173,7 @@ Public Class CCharacter
 
     End Sub
 
-    Public Overridable Sub Update()
+    Public Overridable Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
 
     End Sub
 
@@ -191,7 +201,12 @@ Public Class CCharArmoredArmadillo
     End Sub
 
 
-    Public Overrides Sub Update()
+    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+        Dim EF As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
+        Hitbox(0) = PosX - 20
+        Hitbox(1) = PosY - 20
+        Hitbox(2) = PosX + 20
+        Hitbox(3) = PosY + 20
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
                 GetNextFrame()
@@ -411,8 +426,8 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosY >= 239 Then
-                    PosY = 238
+                If PosY >= 250 Then
+                    PosY = 249
                     Vy = -12
                     Vx = 0
                     State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
@@ -533,7 +548,8 @@ Public Class CCharArmoredArmadilloProjectile
 
     End Sub
 
-    Public Overrides Sub Update()
+    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+
         Select Case CurrState
             Case StateArmoredArmadilloProjectile.Create
                 GetNextFrame()
@@ -544,6 +560,10 @@ Public Class CCharArmoredArmadilloProjectile
             Case StateArmoredArmadilloProjectile.Horizontal
                 GetNextFrame()
                 PosX = PosX + Vx
+                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                    State(StateArmoredArmadilloProjectile.Hit, 2)
+                    Events(1) = True 'MM is hit
+                End If
                 If PosX >= 320 Or PosX <= 20 Then
                     State(StateArmoredArmadilloProjectile.Hit, 2)
                 End If
@@ -562,6 +582,78 @@ Public Class CCharArmoredArmadilloProjectile
         End Select
     End Sub
 
+End Class
+
+Public Class CCharMegaman
+    Inherits CCharacter
+
+    Public CurrState As StateMegaman
+
+    Public Sub State(state As StateMegaman, idxspr As Integer)
+        CurrState = state
+        IdxArrSprites = idxspr
+        CurrFrame = 0
+        FrameIdx = 0
+
+    End Sub
+
+
+    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+        Hitbox(4) = PosX - 20
+        Hitbox(5) = PosY - 20
+        Hitbox(6) = PosX + 20
+        Hitbox(7) = PosY + 20
+        If Events(1) And Not Events(3) Then
+            Vy = -10
+            If Hitbox(0) > Hitbox(4) And Hitbox(2) > Hitbox(6) Then
+                'shot from the right
+                Vx = -5
+                FDir = FaceDir.Right
+            ElseIf Hitbox(0) < Hitbox(4) And Hitbox(2) < Hitbox(6) Then
+                'shot from the left
+                Vx = 5
+                FDir = FaceDir.Left
+            End If
+            State(StateMegaman.Staggered, 3)
+        End If
+        Select Case CurrState
+            Case StateMegaman.Spawn
+                If FrameIdx = 7 And CurrFrame = 1 Then
+                    Events(3) = False
+                    State(StateMegaman.Run, 1)
+                    Vx = 5
+                End If
+                GetNextFrame()
+
+            Case StateMegaman.Run
+                PosX = PosX + Vx
+                'FrameIdx = 0, CurrFrame = 0
+                GetNextFrame()
+                '
+                'FrameIdx = 1, CurrFrame = 0
+                If PosX <= 50 Then
+                    Vx = 5
+                    FDir = FaceDir.Right
+                ElseIf PosX >= 280 Then
+                    Vx = -5
+                    FDir = FaceDir.Left
+                End If
+
+            Case StateMegaman.Staggered
+                GetNextFrame()
+                Events(3) = True 'no collision in this state
+                PosY = PosY + Vy
+                PosX = PosX + Vx
+                Vy = Vy + gravity
+                If FrameIdx = 7 And CurrFrame = 7 Then
+                    Events(1) = False ' MM is hit
+                    Events(2) = False 'MM is dead
+                    Destroy = True
+                End If
+
+        End Select
+
+    End Sub
 End Class
 
 

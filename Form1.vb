@@ -20,8 +20,11 @@ Public Class Form1
         AA_RollingRecoveryArmored,
         AA_RollingRecoveryEndArmored As CArrFrame
     Dim AA_ProjCreate1, AA_ProjHorizontal, AA_ProjHit As CArrFrame
+    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Staggered, MM_Died As CArrFrame
     Dim ListChar As New List(Of CCharacter)
     Dim AA As CCharArmoredArmadillo
+    Dim Hitbox(8) As Integer 'collision points (left, up, right, down) of AA (0-3) and MM (4-7)
+    Dim Events(5) As Boolean 'Hold certain flags and triggers e.g. 0 is AA getting hit, 1 is MM getting hit
 
 
 
@@ -107,7 +110,7 @@ Public Class Form1
         AA.ArrSprites(2) = AA_IntroAnimation
         AA.ArrSprites(3) = AA_Guard
         AA.ArrSprites(4) = AA_ShootArmored
-        '5 is missing
+        '5 is missing, for stagger
         AA.ArrSprites(6) = AA_JumpStartArmored
         AA.ArrSprites(7) = AA_JumpArmored
         AA.ArrSprites(8) = AA_JumpEndArmored
@@ -123,6 +126,12 @@ Public Class Form1
         AA.FDir = FaceDir.Left
 
         ListChar.Add(AA)
+
+        Events(0) = False 'is AA getting hit?
+        Events(1) = False 'is MM getting hit?
+        Events(2) = False 'is MM alive?
+        Events(3) = False 'is MM invincible?
+        Events(4) = False 'is AA invincible?
 
         'initialize sprites for Sprite Projectiles
         AA_ProjCreate1 = New CArrFrame
@@ -141,6 +150,60 @@ Public Class Form1
         AA_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
 
         'TODO: add on hit sprite
+
+
+        'Initialize sprite for megaman
+        MM_Spawn = New CArrFrame
+        MM_Spawn.Insert(657, 803, 651, 794, 674, 812, 20)
+        MM_Spawn.Insert(538, 661, 523, 643, 554, 678, 2)
+        MM_Spawn.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Spawn.Insert(538, 661, 523, 643, 554, 678, 2)
+        MM_Spawn.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Spawn.Insert(538, 661, 523, 643, 554, 678, 2)
+        MM_Spawn.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Spawn.Insert(538, 661, 523, 643, 554, 678, 2)
+        MM_Spawn.Insert(657, 803, 651, 794, 674, 812, 2)
+
+        MM_Run = New CArrFrame
+        MM_Run.Insert(538, 720, 523, 703, 554, 738, 1)
+        MM_Run.Insert(487, 721, 477, 702, 498, 737, 1)
+        MM_Run.Insert(447, 722, 437, 703, 461, 739, 1)
+        MM_Run.Insert(394, 721, 379, 705, 412, 740, 1)
+        MM_Run.Insert(340, 720, 325, 705, 360, 739, 1)
+        MM_Run.Insert(291, 723, 279, 705, 306, 739, 1)
+        MM_Run.Insert(242, 719, 231, 701, 254, 736, 1)
+        MM_Run.Insert(194, 720, 182, 701, 208, 737, 1)
+        MM_Run.Insert(149, 718, 133, 702, 164, 737, 1)
+        MM_Run.Insert(93, 720, 75, 704, 110, 738, 1)
+        MM_Run.Insert(43, 721, 28, 704, 58, 738, 1)
+
+        MM_Shoot = New CArrFrame
+        MM_Shoot.Insert(492, 660, 477, 644, 508, 679, 3)
+        MM_Shoot.Insert(446, 659, 431, 643, 461, 678, 2)
+
+        MM_Staggered = New CArrFrame
+        MM_Staggered.Insert(399, 659, 385, 643, 412, 678, 4)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 4)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
+
+        MM_JumpStart = New CArrFrame
+        MM_JumpStart.Insert(538, 777, 525, 759, 550, 797, 1)
+        MM_JumpStart.Insert(498, 777, 490, 758, 506, 800, 1)
+        MM_JumpStart.Insert(458, 777, 449, 757, 469, 801, 1)
+        MM_JumpStart.Insert(416, 779, 405, 760, 429, 800, 1)
+
+        MM_Jump = New CArrFrame
+        MM_Jump.Insert(416, 779, 405, 760, 429, 800, 1)
+
+        MM_JumpEnd = New CArrFrame
+        MM_JumpEnd.Insert(370, 779, 358, 761, 386, 801, 1)
+        MM_JumpEnd.Insert(321, 777, 308, 760, 333, 799, 1)
+        MM_JumpEnd.Insert(269, 775, 255, 759, 285, 792, 1)
 
 
         bmp = New Bitmap(Img.Width, Img.Height)
@@ -186,20 +249,29 @@ Public Class Form1
             Dim EF As CElmtFrame = cc.ArrSprites(cc.IdxArrSprites).Elmt(cc.FrameIdx)
             Dim spritewidth = EF.Right - EF.Left
             Dim spriteheight = EF.Bottom - EF.Top
+            Dim imgx, imgy As Integer
             If cc.FDir = FaceDir.Left Then
                 Dim spriteleft As Integer = cc.PosX - EF.CtrPoint.x + EF.Left
                 Dim spritetop As Integer = cc.PosY - EF.CtrPoint.y + EF.Top
                 'set mask
                 For i = 0 To spritewidth
                     For j = 0 To spriteheight
-                        Img.Elmt(spriteleft + i, spritetop + j) = OpAnd(Img.Elmt(spriteleft + i, spritetop + j), SpriteMask.Elmt(EF.Left + i, EF.Top + j))
+                        imgx = spriteleft + i
+                        imgy = spritetop + j
+                        If imgx >= 0 And imgx <= Img.Width - 1 And imgy >= 0 And imgy <= Img.Height - 1 Then
+                            Img.Elmt(spriteleft + i, spritetop + j) = OpAnd(Img.Elmt(spriteleft + i, spritetop + j), SpriteMask.Elmt(EF.Left + i, EF.Top + j))
+                        End If
                     Next
                 Next
 
                 'set sprite
                 For i = 0 To spritewidth
                     For j = 0 To spriteheight
-                        Img.Elmt(spriteleft + i, spritetop + j) = OpOr(Img.Elmt(spriteleft + i, spritetop + j), SpriteMap.Elmt(EF.Left + i, EF.Top + j))
+                        imgx = spriteleft + i
+                        imgy = spritetop + j
+                        If imgx >= 0 And imgx <= Img.Width - 1 And imgy >= 0 And imgy <= Img.Height - 1 Then
+                            Img.Elmt(spriteleft + i, spritetop + j) = OpOr(Img.Elmt(spriteleft + i, spritetop + j), SpriteMap.Elmt(EF.Left + i, EF.Top + j))
+                        End If
                     Next
                 Next
             Else 'facing right
@@ -208,14 +280,22 @@ Public Class Form1
                 'set mask
                 For i = 0 To spritewidth
                     For j = 0 To spriteheight
-                        Img.Elmt(spriteleft + i, spritetop + j) = OpAnd(Img.Elmt(spriteleft + i, spritetop + j), SpriteMask.Elmt(EF.Right - i, EF.Top + j))
+                        imgx = spriteleft + i
+                        imgy = spritetop + j
+                        If imgx >= 0 And imgx <= Img.Width - 1 And imgy >= 0 And imgy <= Img.Height - 1 Then
+                            Img.Elmt(spriteleft + i, spritetop + j) = OpAnd(Img.Elmt(spriteleft + i, spritetop + j), SpriteMask.Elmt(EF.Right - i, EF.Top + j))
+                        End If
                     Next
                 Next
 
                 'set sprite
                 For i = 0 To spritewidth
                     For j = 0 To spriteheight
-                        Img.Elmt(spriteleft + i, spritetop + j) = OpOr(Img.Elmt(spriteleft + i, spritetop + j), SpriteMap.Elmt(EF.Right - i, EF.Top + j))
+                        imgx = spriteleft + i
+                        imgy = spritetop + j
+                        If imgx >= 0 And imgx <= Img.Width - 1 And imgy >= 0 And imgy <= Img.Height - 1 Then
+                            Img.Elmt(spriteleft + i, spritetop + j) = OpOr(Img.Elmt(spriteleft + i, spritetop + j), SpriteMap.Elmt(EF.Right - i, EF.Top + j))
+                        End If
                     Next
                 Next
 
@@ -319,12 +399,16 @@ Public Class Form1
         PictureBox1.Refresh()
 
         For Each CC In ListChar
-            CC.Update()
+            CC.Update(Hitbox, Events)
 
         Next
 
         If AA.CurrState = StateArmoredArmadillo.ShootArmored And AA.CurrFrame = 2 Then
             CreateArmoredArmadilloProjectile(1)
+        End If
+
+        If Events(2) = False Then
+            SpawnMegaman()
         End If
 
         Dim Listchar1 As New List(Of CCharacter)
@@ -342,30 +426,55 @@ Public Class Form1
     End Sub
 
     Sub CreateArmoredArmadilloProjectile(n As Integer)
-        Dim SP As CCharArmoredArmadilloProjectile
+        Dim AAP As CCharArmoredArmadilloProjectile
 
-        SP = New CCharArmoredArmadilloProjectile
+        AAP = New CCharArmoredArmadilloProjectile
         If AA.FDir = FaceDir.Left Then
-            SP.PosX = AA.PosX - 20
-            SP.FDir = FaceDir.Left
+            AAP.PosX = AA.PosX - 20
+            AAP.FDir = FaceDir.Left
         Else
-            SP.PosX = AA.PosX + 20
-            SP.FDir = FaceDir.Right
+            AAP.PosX = AA.PosX + 20
+            AAP.FDir = FaceDir.Right
         End If
 
-        SP.PosY = AA.PosY - 10
+        AAP.PosY = AA.PosY - 10
 
-        SP.Vx = 0
-        SP.Vy = 0
-        SP.CurrState = StateArmoredArmadilloProjectile.Create
-        ReDim SP.ArrSprites(2)
+        AAP.Vx = 0
+        AAP.Vy = 0
+        AAP.CurrState = StateArmoredArmadilloProjectile.Create
+        ReDim AAP.ArrSprites(2)
         If n = 1 Then
-            SP.ArrSprites(0) = AA_ProjCreate1
+            AAP.ArrSprites(0) = AA_ProjCreate1
         End If
-        SP.ArrSprites(1) = AA_ProjHorizontal
-        SP.ArrSprites(2) = AA_ProjHit
+        AAP.ArrSprites(1) = AA_ProjHorizontal
+        AAP.ArrSprites(2) = AA_ProjHit
 
-        ListChar.Add(SP)
+        ListChar.Add(AAP)
+    End Sub
+
+    Sub SpawnMegaman()
+        Dim MM As CCharMegaman
+        Events(2) = True 'MM is alive
+        Events(3) = True 'MM is invinclible in this state
+
+        MM = New CCharMegaman
+        MM.FDir = FaceDir.Right
+
+        MM.PosX = 60
+        MM.PosY = 238
+
+        MM.Vx = 0
+        MM.Vy = 0
+        MM.State(StateMegaman.Spawn, 0)
+        ReDim MM.ArrSprites(7)
+        MM.ArrSprites(0) = MM_Spawn
+        MM.ArrSprites(1) = MM_Run
+        MM.ArrSprites(2) = MM_Shoot
+        MM.ArrSprites(3) = MM_Staggered
+        MM.ArrSprites(4) = MM_JumpStart
+        MM.ArrSprites(5) = MM_Jump
+        MM.ArrSprites(6) = MM_JumpEnd
+        ListChar.Add(MM)
     End Sub
 
     Private Sub ArmoredArmadillo_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
