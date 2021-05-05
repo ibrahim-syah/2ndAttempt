@@ -292,7 +292,8 @@ Public Class CCharArmoredArmadillo
                 If isIntro Then
                     PosY = PosY + Vy
                     Vy = Vy + gravity
-                    If PosY >= 235 Then
+                    If PosY >= 239 Then
+                        PosY = 238
                         Vy = -10
                         State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                     End If
@@ -409,7 +410,7 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosY >= 250 Then
+                If PosY >= 239 Then
                     PosY = 238
                     Vy = -10
                     Vx = 0
@@ -489,7 +490,7 @@ Public Class CCharArmoredArmadillo
 
             Case StateArmoredArmadillo.RollingRecoveryArmored
                 GetNextFrame()
-                If FrameIdx = 6 Or PosY >= 238 Then
+                If FrameIdx = 6 Or PosY >= 239 Then
                     State(StateArmoredArmadillo.RollingRecoveryEndArmored, 11)
                 End If
                 PosX = PosX + Vx
