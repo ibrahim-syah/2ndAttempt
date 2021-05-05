@@ -235,7 +235,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
             Case StateArmoredArmadillo.IntroAnimation
                 GetNextFrame()
-                If CurrFrame = 4 And FrameIdx = 5 Then
+                If CurrFrame = 4 And FrameIdx = 6 Then
                     State(StateArmoredArmadillo.StandArmored, 0)
                 End If
 
@@ -257,7 +257,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
 
             Case StateArmoredArmadillo.JumpStartArmored
-                Vy = -10
+                Vy = -12
                 Vx = 0
                 GetNextFrame()
                 State(StateArmoredArmadillo.JumpArmored, 7)
@@ -280,9 +280,9 @@ Public Class CCharArmoredArmadillo
                     State(StateArmoredArmadillo.Rolling, 9)
                     PosY = 238
                     If FDir = FaceDir.Left Then
-                        Vx = -10
+                        Vx = -20
                     Else
-                        Vx = 10
+                        Vx = 20
                     End If
                     wallbangCounter = 0
                 End If
@@ -295,7 +295,7 @@ Public Class CCharArmoredArmadillo
                     Vy = Vy + gravity
                     If PosY >= 239 Then
                         PosY = 238
-                        Vy = -10
+                        Vy = -12
                         State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                     End If
 
@@ -315,7 +315,7 @@ Public Class CCharArmoredArmadillo
                         End If
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
@@ -331,7 +331,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 210
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
@@ -345,7 +345,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 120
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
@@ -369,7 +369,7 @@ Public Class CCharArmoredArmadillo
                         End If
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
@@ -385,7 +385,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 300
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
@@ -399,7 +399,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 30
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 20)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         If rnd.NextDouble() < 0.2 Then
@@ -413,7 +413,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
                 If PosY >= 239 Then
                     PosY = 238
-                    Vy = -10
+                    Vy = -12
                     Vx = 0
                     State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                 End If
@@ -435,7 +435,7 @@ Public Class CCharArmoredArmadillo
                         End If
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 5)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
@@ -448,7 +448,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 210
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 5)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                     End If
@@ -470,7 +470,7 @@ Public Class CCharArmoredArmadillo
                         End If
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 5)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
@@ -483,7 +483,7 @@ Public Class CCharArmoredArmadillo
                         lowerBoundAngle = 300
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(lowerBoundAngle, upperBoundAngle + 1)
-                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 10)
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, 5)
                         Vx = Velocity(0)
                         Vy = Velocity(1) * -1
                     End If
@@ -554,7 +554,7 @@ Public Class CCharArmoredArmadilloProjectile
                 End If
 
             Case StateArmoredArmadilloProjectile.Hit
-                If FrameIdx = 3 And CurrFrame = 1 Then
+                If FrameIdx = 3 And CurrFrame = 0 Then
                     Destroy = True
                 End If
                 GetNextFrame()

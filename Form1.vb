@@ -33,7 +33,7 @@ Public Class Form1
         Randomize()
 
         Bg = New CImage
-        Bg.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\jajal.bmp")
+        Bg.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\scenery.bmp")
 
         Bg.CopyImg(Img)
 
@@ -44,57 +44,61 @@ Public Class Form1
 
         'initialize sprites for Armored Armadillo
         AA_StandArmored = New CArrFrame
-        AA_StandArmored.Insert(364, 24, 345, 4, 387, 44, 1)
+        AA_StandArmored.Insert(107, 71, 87, 50, 133, 93, 1)
 
         AA_WalkDebug = New CArrFrame
-        AA_WalkDebug.Insert(94, 82, 70, 56, 123, 101, 1)
+        AA_WalkDebug.Insert(174, 71, 151, 50, 207, 92, 1)
+        AA_WalkDebug.Insert(41, 72, 17, 44, 76, 94, 1)
 
 
         AA_IntroAnimation = New CArrFrame
-        AA_IntroAnimation.Insert(364, 24, 345, 4, 387, 44, 2)
-        AA_IntroAnimation.Insert(421, 24, 401, 4, 451, 43, 2)
-        AA_IntroAnimation.Insert(364, 24, 345, 4, 387, 44, 2)
-        AA_IntroAnimation.Insert(421, 24, 401, 4, 451, 43, 2)
-        AA_IntroAnimation.Insert(28, 82, 9, 62, 57, 101, 5)
-        AA_IntroAnimation.Insert(94, 82, 70, 56, 123, 101, 5)
+        AA_IntroAnimation.Insert(107, 71, 87, 50, 133, 93, 2)
+        AA_IntroAnimation.Insert(174, 71, 151, 50, 207, 92, 2)
+        AA_IntroAnimation.Insert(107, 71, 87, 50, 133, 93, 8)
+        AA_IntroAnimation.Insert(174, 71, 151, 50, 207, 92, 8)
+        AA_IntroAnimation.Insert(109, 131, 89, 107, 142, 150, 4)
+        AA_IntroAnimation.Insert(176, 131, 157, 106, 210, 148, 4)
+        AA_IntroAnimation.Insert(41, 72, 17, 44, 76, 94, 5)
 
         AA_Guard = New CArrFrame
-        AA_Guard.Insert(28, 82, 9, 62, 57, 101, 5)
+        AA_Guard.Insert(109, 131, 89, 107, 142, 150, 2)
+        'AA_Guard.Insert(176, 131, 157, 106, 210, 148, 2)
 
         AA_ShootArmored = New CArrFrame
-        AA_ShootArmored.Insert(210, 84, 190, 62, 240, 103, 3)
-        AA_ShootArmored.Insert(264, 84, 246, 63, 295, 102, 2)
+        AA_ShootArmored.Insert(237, 72, 216, 48, 271, 93, 3)
+        AA_ShootArmored.Insert(42, 129, 22, 105, 77, 149, 2)
 
         AA_JumpStartArmored = New CArrFrame
-        AA_JumpStartArmored.Insert(364, 24, 345, 4, 387, 44, 1)
+        AA_JumpStartArmored.Insert(124, 236, 99, 214, 148, 272, 1)
 
         AA_JumpArmored = New CArrFrame
-        AA_JumpArmored.Insert(315, 22, 293, 3, 338, 55, 2) 'refer to video for how long(frame) the jump is
-        AA_JumpArmored.Insert(29, 137, 4, 114, 55, 158, 2)
-        AA_JumpArmored.Insert(315, 22, 293, 3, 338, 55, 2)
-        AA_JumpArmored.Insert(214, 21, 195, 3, 234, 54, 2)
-        AA_JumpArmored.Insert(167, 23, 153, 3, 188, 41, 2)
+        AA_JumpArmored.Insert(124, 236, 99, 214, 148, 272, 8)
+        AA_JumpArmored.Insert(252, 177, 226, 154, 284, 204, 3)
+        AA_JumpArmored.Insert(124, 236, 99, 214, 148, 272, 3)
+        AA_JumpArmored.Insert(191, 234, 169, 214, 212, 272, 2)
+        AA_JumpArmored.Insert(249, 241, 231, 221, 269, 263, 2)
 
         AA_JumpEndArmored = New CArrFrame
-        AA_JumpEndArmored.Insert(167, 23, 153, 3, 188, 41, 1)
+        AA_JumpEndArmored.Insert(249, 241, 231, 221, 269, 263, 1)
 
         AA_Rolling = New CArrFrame
-        AA_Rolling.Insert(23, 20, 8, 5, 39, 34, 1)
-        AA_Rolling.Insert(59, 17, 45, 2, 75, 32, 1)
-        AA_Rolling.Insert(96, 19, 81, 3, 112, 34, 1)
-        AA_Rolling.Insert(132, 15, 116, 3, 146, 28, 1)
+        AA_Rolling.Insert(276, 487, 260, 474, 293, 501, 1)
+        AA_Rolling.Insert(229, 489, 213, 472, 246, 505, 1)
+        'AA_Rolling.Insert(82, 487, 66, 470, 99, 502, 1)
+        'AA_Rolling.Insert(132, 486, 116, 470, 149, 502, 1)
 
         AA_RollingRecoveryArmored = New CArrFrame
-        AA_RollingRecoveryArmored.Insert(23, 20, 8, 5, 39, 34, 2)
-        AA_RollingRecoveryArmored.Insert(59, 17, 45, 2, 75, 32, 2)
-        AA_RollingRecoveryArmored.Insert(96, 19, 81, 3, 112, 34, 2)
-        AA_RollingRecoveryArmored.Insert(132, 15, 116, 3, 146, 28, 2)
-        AA_RollingRecoveryArmored.Insert(167, 23, 153, 3, 188, 41, 2)
-        AA_RollingRecoveryArmored.Insert(214, 21, 195, 3, 234, 54, 2)
-        AA_RollingRecoveryArmored.Insert(315, 22, 293, 3, 338, 55, 2)
+        AA_RollingRecoveryArmored.Insert(276, 487, 260, 474, 293, 501, 1)
+        AA_RollingRecoveryArmored.Insert(229, 489, 213, 472, 246, 505, 1)
+        AA_RollingRecoveryArmored.Insert(276, 487, 260, 474, 293, 501, 1)
+        AA_RollingRecoveryArmored.Insert(229, 489, 213, 472, 246, 505, 1)
+        AA_RollingRecoveryArmored.Insert(249, 241, 231, 221, 269, 263, 2)
+        AA_RollingRecoveryArmored.Insert(191, 234, 169, 214, 212, 272, 2)
+        AA_RollingRecoveryArmored.Insert(54, 234, 28, 214, 77, 272, 2)
+        AA_RollingRecoveryArmored.Insert(124, 236, 99, 214, 148, 272, 2)
 
         AA_RollingRecoveryEndArmored = New CArrFrame
-        AA_RollingRecoveryEndArmored.Insert(315, 22, 293, 3, 338, 55, 5)
+        AA_RollingRecoveryEndArmored.Insert(124, 236, 99, 214, 148, 272, 2)
 
         AA = New CCharArmoredArmadillo
         ReDim AA.ArrSprites(11)
@@ -122,21 +126,19 @@ Public Class Form1
 
         'initialize sprites for Sprite Projectiles
         AA_ProjCreate1 = New CArrFrame
-        'AA_ProjCreate1.Insert(329, 81, 321, 73, 336, 88, 1)
-        'AA_ProjCreate1.Insert(346, 81, 339, 75, 352, 88, 1)
-        'AA_ProjCreate1.Insert(363, 81, 356, 73, 372, 90, 1)
-        AA_ProjCreate1.Insert(433, 81, 425, 71, 446, 91, 1)
+        AA_ProjCreate1.Insert(191, 22, 184, 14, 202, 29, 1)
+        AA_ProjCreate1.Insert(252, 23, 243, 13, 264, 33, 1)
 
         AA_ProjHorizontal = New CArrFrame
-        AA_ProjHorizontal.Insert(384, 81, 377, 73, 395, 88, 1)
-        AA_ProjHorizontal.Insert(406, 81, 399, 73, 419, 88, 1)
-        AA_ProjHorizontal.Insert(363, 82, 356, 73, 372, 90, 1)
+        AA_ProjHorizontal.Insert(162, 22, 155, 13, 172, 30, 1)
+        AA_ProjHorizontal.Insert(191, 22, 184, 14, 202, 29, 1)
+        AA_ProjHorizontal.Insert(217, 23, 211, 15, 232, 30, 1)
 
         AA_ProjHit = New CArrFrame
-        AA_ProjHit.Insert(346, 81, 339, 75, 352, 88, 1)
-        AA_ProjHit.Insert(329, 81, 321, 73, 336, 88, 1)
-        AA_ProjHit.Insert(346, 81, 339, 75, 352, 88, 1)
-        AA_ProjHit.Insert(308, 81, 300, 72, 316, 89, 2)
+        AA_ProjHit.Insert(104, 20, 97, 13, 112, 28, 2)
+        AA_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
+        AA_ProjHit.Insert(76, 21, 68, 12, 85, 29, 1)
+        AA_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
 
         'TODO: add on hit sprite
 
