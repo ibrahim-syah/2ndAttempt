@@ -173,7 +173,7 @@ Public Class CCharacter
 
     End Sub
 
-    Public Overridable Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+    Public Overridable Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
 
     End Sub
 
@@ -201,12 +201,12 @@ Public Class CCharArmoredArmadillo
     End Sub
 
 
-    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
         Dim EF As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
-        Hitbox(0) = PosX - 20
-        Hitbox(1) = PosY - 20
-        Hitbox(2) = PosX + 20
-        Hitbox(3) = PosY + 20
+        Hitbox(0, 0) = PosX - 20
+        Hitbox(0, 1) = PosY - 20
+        Hitbox(0, 2) = PosX + 20
+        Hitbox(0, 3) = PosY + 20
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
                 GetNextFrame()
@@ -305,7 +305,7 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.Rolling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
                     Events(1) = True 'MM is hit
                 End If
                 If isIntro Then
@@ -429,7 +429,7 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
                     Events(1) = True 'MM is hit
                 End If
                 If PosY >= 250 Then
@@ -554,7 +554,7 @@ Public Class CCharArmoredArmadilloProjectile
 
     End Sub
 
-    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
+    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
 
         Select Case CurrState
             Case StateArmoredArmadilloProjectile.Create
@@ -566,7 +566,7 @@ Public Class CCharArmoredArmadilloProjectile
             Case StateArmoredArmadilloProjectile.Horizontal
                 GetNextFrame()
                 PosX = PosX + Vx
-                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
                     State(StateArmoredArmadilloProjectile.Hit, 2)
                     Events(1) = True 'MM is hit
                 End If
@@ -604,18 +604,18 @@ Public Class CCharMegaman
     End Sub
 
 
-    Public Overrides Sub Update(ByRef Hitbox() As Integer, ByRef Events() As Boolean)
-        Hitbox(4) = PosX - 20
-        Hitbox(5) = PosY - 20
-        Hitbox(6) = PosX + 20
-        Hitbox(7) = PosY + 20
+    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
+        Hitbox(1, 0) = PosX - 20
+        Hitbox(1, 1) = PosY - 20
+        Hitbox(1, 2) = PosX + 20
+        Hitbox(1, 3) = PosY + 20
         If Events(1) And Not Events(3) Then
             Vy = -10
-            If Hitbox(0) > Hitbox(4) And Hitbox(2) > Hitbox(6) Then
+            If Hitbox(0, 0) > Hitbox(1, 0) And Hitbox(0, 2) > Hitbox(1, 2) Then
                 'shot from the right
                 Vx = -5
                 FDir = FaceDir.Right
-            ElseIf Hitbox(0) < Hitbox(4) And Hitbox(2) < Hitbox(6) Then
+            ElseIf Hitbox(0, 0) < Hitbox(1, 0) And Hitbox(0, 2) < Hitbox(1, 2) Then
                 'shot from the left
                 Vx = 5
                 FDir = FaceDir.Left
