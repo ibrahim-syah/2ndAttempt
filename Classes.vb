@@ -305,6 +305,9 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.Rolling
                 Dim rnd As New Random()
                 GetNextFrame()
+                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                    Events(1) = True 'MM is hit
+                End If
                 If isIntro Then
                     PosY = PosY + Vy
                     Vy = Vy + gravity
@@ -426,6 +429,9 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
+                If PosX >= Hitbox(4) And PosX <= Hitbox(6) And PosY >= Hitbox(5) And PosY <= Hitbox(7) And Events(3) = False Then
+                    Events(1) = True 'MM is hit
+                End If
                 If PosY >= 250 Then
                     PosY = 249
                     Vy = -12
@@ -621,7 +627,6 @@ Public Class CCharMegaman
                 If FrameIdx = 7 And CurrFrame = 1 Then
                     Events(3) = False
                     State(StateMegaman.Run, 1)
-                    Vx = 5
                 End If
                 GetNextFrame()
 

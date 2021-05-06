@@ -33,7 +33,7 @@ Public Class Form1
         'open image for background, assign to bg
 
         ' Initialize the random-number generator.
-        Randomize()
+        'Randomize()
 
         Bg = New CImage
         Bg.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\scenery.bmp")
@@ -182,13 +182,13 @@ Public Class Form1
         MM_Shoot.Insert(446, 659, 431, 643, 461, 678, 2)
 
         MM_Staggered = New CArrFrame
-        MM_Staggered.Insert(399, 659, 385, 643, 412, 678, 4)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 4)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 8)
+        MM_Staggered.Insert(399, 659, 385, 643, 412, 678, 2)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
         MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
 
         MM_JumpStart = New CArrFrame
@@ -454,16 +454,24 @@ Public Class Form1
 
     Sub SpawnMegaman()
         Dim MM As CCharMegaman
+        Dim rnd As New Random()
         Events(2) = True 'MM is alive
         Events(3) = True 'MM is invinclible in this state
 
         MM = New CCharMegaman
-        MM.FDir = FaceDir.Right
 
-        MM.PosX = 60
+        Dim RandomizedSpawnXPos As Integer = rnd.Next(60, 269 + 1)
+        MM.PosX = RandomizedSpawnXPos
+
+        If MM.PosX >= 164 Then
+            MM.FDir = FaceDir.Left
+            MM.Vx = -5
+        Else
+            MM.FDir = FaceDir.Right
+            MM.Vx = 5
+        End If
         MM.PosY = 238
 
-        MM.Vx = 0
         MM.Vy = 0
         MM.State(StateMegaman.Spawn, 0)
         ReDim MM.ArrSprites(7)
