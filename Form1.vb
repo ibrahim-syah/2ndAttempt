@@ -13,6 +13,7 @@ Public Class Form1
         AA_IntroAnimation,
         AA_Guard,
         AA_ShootArmored,
+        AA_StaggeredArmored,
         AA_JumpStartArmored,
         AA_JumpArmored,
         AA_JumpEndArmored,
@@ -20,11 +21,13 @@ Public Class Form1
         AA_RollingRecoveryArmored,
         AA_RollingRecoveryEndArmored As CArrFrame
     Dim AA_ProjCreate1, AA_ProjHorizontal, AA_ProjHit As CArrFrame
-    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Staggered, MM_Died As CArrFrame
+    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Staggered, MM_Died, MM_Stand, MM_JumpDown As CArrFrame
+    Dim MM_ProjCreate1, MM_ProjHorizontal, MM_ProjHit As CArrFrame
     Dim ListChar As New List(Of CCharacter)
     Dim AA As CCharArmoredArmadillo
+    Dim MM As CCharMegaman
     Dim Hitbox(2, 4) As Integer 'collision points (left, up, right, down) of AA (0-3) and MM (4-7)
-    Dim Events(5) As Boolean 'Hold certain flags and triggers e.g. 0 is AA getting hit, 1 is MM getting hit
+    Dim Events(6) As Boolean 'Hold certain flags and triggers e.g. 0 is AA getting hit, 1 is MM getting hit
 
 
 
@@ -71,6 +74,14 @@ Public Class Form1
         AA_ShootArmored.Insert(237, 72, 216, 48, 271, 93, 3)
         AA_ShootArmored.Insert(42, 129, 22, 105, 77, 149, 2)
 
+        AA_StaggeredArmored = New CArrFrame
+        AA_StaggeredArmored.Insert(48, 309, 19, 285, 79, 333, 2)
+        AA_StaggeredArmored.Insert(34, 588, 5, 564, 65, 612, 2)
+        AA_StaggeredArmored.Insert(48, 309, 19, 285, 79, 333, 2)
+        AA_StaggeredArmored.Insert(34, 588, 5, 564, 65, 612, 2)
+        AA_StaggeredArmored.Insert(48, 309, 19, 285, 79, 333, 2)
+        AA_StaggeredArmored.Insert(34, 588, 5, 564, 65, 612, 2)
+
         AA_JumpStartArmored = New CArrFrame
         AA_JumpStartArmored.Insert(124, 236, 99, 214, 148, 272, 1)
 
@@ -103,6 +114,7 @@ Public Class Form1
         AA_RollingRecoveryEndArmored = New CArrFrame
         AA_RollingRecoveryEndArmored.Insert(124, 236, 99, 214, 148, 272, 2)
 
+
         AA = New CCharArmoredArmadillo
         ReDim AA.ArrSprites(11)
         AA.ArrSprites(0) = AA_StandArmored
@@ -110,7 +122,7 @@ Public Class Form1
         AA.ArrSprites(2) = AA_IntroAnimation
         AA.ArrSprites(3) = AA_Guard
         AA.ArrSprites(4) = AA_ShootArmored
-        '5 is missing, for stagger
+        AA.ArrSprites(5) = AA_StaggeredArmored
         AA.ArrSprites(6) = AA_JumpStartArmored
         AA.ArrSprites(7) = AA_JumpArmored
         AA.ArrSprites(8) = AA_JumpEndArmored
@@ -130,8 +142,9 @@ Public Class Form1
         Events(0) = False 'is AA getting hit?
         Events(1) = False 'is MM getting hit?
         Events(2) = False 'is MM alive?
-        Events(3) = False 'is MM invincible?
-        Events(4) = False 'is AA invincible?
+        Events(3) = False 'is MM invincible (collision will not be registered)?
+        Events(4) = False 'is AA guarding/rolling (projectile will be deflected)?
+        Events(5) = True 'is AA invincible (collision will not be registered)?
 
         'initialize sprites for Sprite Projectiles
         AA_ProjCreate1 = New CArrFrame
@@ -148,8 +161,6 @@ Public Class Form1
         AA_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
         AA_ProjHit.Insert(76, 21, 68, 12, 85, 29, 1)
         AA_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
-
-        'TODO: add on hit sprite
 
 
         'Initialize sprite for megaman
@@ -192,18 +203,40 @@ Public Class Form1
         MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
 
         MM_JumpStart = New CArrFrame
-        MM_JumpStart.Insert(538, 777, 525, 759, 550, 797, 1)
-        MM_JumpStart.Insert(498, 777, 490, 758, 506, 800, 1)
-        MM_JumpStart.Insert(458, 777, 449, 757, 469, 801, 1)
-        MM_JumpStart.Insert(416, 779, 405, 760, 429, 800, 1)
+        MM_JumpStart.Insert(269, 775, 255, 759, 285, 792, 3)
+
 
         MM_Jump = New CArrFrame
-        MM_Jump.Insert(416, 779, 405, 760, 429, 800, 1)
+        MM_Jump.Insert(538, 777, 525, 759, 550, 797, 2)
+        MM_Jump.Insert(498, 777, 490, 758, 506, 800, 2)
+        MM_Jump.Insert(458, 777, 449, 757, 469, 801, 20)
+
+        MM_JumpDown = New CArrFrame
+        MM_JumpDown.Insert(416, 779, 405, 760, 429, 800, 1)
 
         MM_JumpEnd = New CArrFrame
-        MM_JumpEnd.Insert(370, 779, 358, 761, 386, 801, 1)
-        MM_JumpEnd.Insert(321, 777, 308, 760, 333, 799, 1)
-        MM_JumpEnd.Insert(269, 775, 255, 759, 285, 792, 1)
+        MM_JumpEnd.Insert(370, 779, 358, 761, 386, 801, 2)
+        MM_JumpEnd.Insert(321, 777, 308, 760, 333, 799, 2)
+        MM_JumpEnd.Insert(269, 775, 255, 759, 285, 792, 3)
+
+        MM_Stand = New CArrFrame
+        MM_Stand.Insert(538, 661, 523, 643, 554, 678, 1)
+
+        'initialize sprites for Sprite Projectiles
+        MM_ProjCreate1 = New CArrFrame
+        MM_ProjCreate1.Insert(191, 22, 184, 14, 202, 29, 1)
+        MM_ProjCreate1.Insert(252, 23, 243, 13, 264, 33, 1)
+
+        MM_ProjHorizontal = New CArrFrame
+        MM_ProjHorizontal.Insert(162, 22, 155, 13, 172, 30, 1)
+        MM_ProjHorizontal.Insert(191, 22, 184, 14, 202, 29, 1)
+        MM_ProjHorizontal.Insert(217, 23, 211, 15, 232, 30, 1)
+
+        MM_ProjHit = New CArrFrame
+        MM_ProjHit.Insert(104, 20, 97, 13, 112, 28, 2)
+        MM_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
+        MM_ProjHit.Insert(76, 21, 68, 12, 85, 29, 1)
+        MM_ProjHit.Insert(134, 21, 128, 15, 141, 28, 1)
 
 
         bmp = New Bitmap(Img.Width, Img.Height)
@@ -404,11 +437,15 @@ Public Class Form1
         Next
 
         If AA.CurrState = StateArmoredArmadillo.ShootArmored And AA.CurrFrame = 2 Then
-            CreateArmoredArmadilloProjectile(1)
+            CreateArmoredArmadilloProjectile()
         End If
 
         If Events(2) = False Then
-            SpawnMegaman()
+            SpawnMegaman(MM)
+        Else
+            If MM.CurrState = StateMegaman.Shoot And MM.CurrFrame = 2 Then
+                CreateMegamanProjectile()
+            End If
         End If
 
         Dim Listchar1 As New List(Of CCharacter)
@@ -425,7 +462,7 @@ Public Class Form1
 
     End Sub
 
-    Sub CreateArmoredArmadilloProjectile(n As Integer)
+    Sub CreateArmoredArmadilloProjectile()
         Dim AAP As CCharArmoredArmadilloProjectile
 
         AAP = New CCharArmoredArmadilloProjectile
@@ -443,17 +480,14 @@ Public Class Form1
         AAP.Vy = 0
         AAP.CurrState = StateArmoredArmadilloProjectile.Create
         ReDim AAP.ArrSprites(2)
-        If n = 1 Then
-            AAP.ArrSprites(0) = AA_ProjCreate1
-        End If
+        AAP.ArrSprites(0) = AA_ProjCreate1
         AAP.ArrSprites(1) = AA_ProjHorizontal
         AAP.ArrSprites(2) = AA_ProjHit
 
         ListChar.Add(AAP)
     End Sub
 
-    Sub SpawnMegaman()
-        Dim MM As CCharMegaman
+    Sub SpawnMegaman(ByRef MM As CCharMegaman)
         Dim rnd As New Random()
         Events(2) = True 'MM is alive
         Events(3) = True 'MM is invinclible in this state
@@ -474,7 +508,7 @@ Public Class Form1
 
         MM.Vy = 0
         MM.State(StateMegaman.Spawn, 0)
-        ReDim MM.ArrSprites(7)
+        ReDim MM.ArrSprites(9)
         MM.ArrSprites(0) = MM_Spawn
         MM.ArrSprites(1) = MM_Run
         MM.ArrSprites(2) = MM_Shoot
@@ -482,7 +516,34 @@ Public Class Form1
         MM.ArrSprites(4) = MM_JumpStart
         MM.ArrSprites(5) = MM_Jump
         MM.ArrSprites(6) = MM_JumpEnd
+        MM.ArrSprites(7) = MM_Stand
+        MM.ArrSprites(8) = MM_JumpDown
         ListChar.Add(MM)
+    End Sub
+
+    Sub CreateMegamanProjectile()
+        Dim MMP As CCharMegamanProjectile
+
+        MMP = New CCharMegamanProjectile
+        If MM.FDir = FaceDir.Left Then
+            MMP.PosX = MM.PosX - 20
+            MMP.FDir = FaceDir.Left
+        Else
+            MMP.PosX = MM.PosX + 20
+            MMP.FDir = FaceDir.Right
+        End If
+
+        MMP.PosY = MM.PosY
+
+        MMP.Vx = 0
+        MMP.Vy = 0
+        MMP.CurrState = StateArmoredArmadilloProjectile.Create
+        ReDim MMP.ArrSprites(2)
+        MMP.ArrSprites(0) = MM_ProjCreate1
+        MMP.ArrSprites(1) = MM_ProjHorizontal
+        MMP.ArrSprites(2) = MM_ProjHit
+
+        ListChar.Add(MMP)
     End Sub
 
     Private Sub ArmoredArmadillo_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -494,17 +555,14 @@ Public Class Form1
             AA.FDir = FaceDir.Right
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isGuarding = True
+            Events(4) = True
+        ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.Guard Then
+            AA.isGuarding = False
+            Events(4) = False
         ElseIf e.KeyCode = Keys.S And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isShooting = True
         ElseIf e.KeyCode = Keys.Space And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isInRollingAnimation = True
-        End If
-    End Sub
-
-    Private Sub ArmoredArmadillo_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-
-        If e.KeyCode = Keys.Down Then
-            AA.isGuarding = False
         End If
     End Sub
 
