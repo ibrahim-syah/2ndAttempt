@@ -227,50 +227,50 @@ Public Class CCharArmoredArmadillo
             Events(5) = True
             State(StateArmoredArmadillo.StaggeredArmored, 5)
         End If
-        If PosX <= MMHitbox.Right And PosX >= MMHitbox.Left And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Not Events(3) Then
+        If MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) Then
             Events(6) = True
         End If
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
                 GetNextFrame()
-                If isWalking Then
-                    State(StateArmoredArmadillo.WalkDebug, 1)
-                ElseIf isGuarding Then
+                'If isWalking Then
+                '    State(StateArmoredArmadillo.WalkDebug, 1)
+                If isGuarding Then
                     State(StateArmoredArmadillo.Guard, 3)
                 ElseIf isShooting Then
                     State(StateArmoredArmadillo.ShootArmored, 4)
                 ElseIf isInRollingAnimation Then
                     State(StateArmoredArmadillo.JumpStartArmored, 6)
                 End If
-            Case StateArmoredArmadillo.WalkDebug
-                PosX = PosX + Vx
-                If FDir = FaceDir.Left And isWalking = True Then
-                    Vx = -5
-                    PosX = PosX + Vx
-                    If AAHitbox.Left <= 22 Then
-                        Vx *= -1
-                        FDir = FaceDir.Right
-                    End If
+            'Case StateArmoredArmadillo.WalkDebug
+            '    PosX = PosX + Vx
+            '    If FDir = FaceDir.Left Then
+            '        Vx = -5
+            '        PosX = PosX + Vx
+            '        If AAHitbox.Left <= 22 Then
+            '            Vx *= -1
+            '            FDir = FaceDir.Right
+            '        End If
 
-                ElseIf FDir = FaceDir.Right And isWalking = True Then
-                    Vx = 5
-                    PosX = PosX + Vx
-                    If AAHitbox.Right >= 323 Then
-                        Vx *= -1
-                        FDir = FaceDir.Left
-                    End If
-                End If
-                ' stopping walk
-                'stopping left
-                If FrameIdx = 0 And PosX >= PosX + Vx Then
-                    isWalking = False
-                    State(StateArmoredArmadillo.StandArmored, 0)
-                    'stopping right
-                ElseIf CurrFrame = 0 And PosX <= PosX + Vx Then
-                    isWalking = False
-                    State(StateArmoredArmadillo.StandArmored, 0)
-                End If
-                GetNextFrame()
+            '    ElseIf FDir = FaceDir.Right And isWalking = True Then
+            '        Vx = 5
+            '        PosX = PosX + Vx
+            '        If AAHitbox.Right >= 323 Then
+            '            Vx *= -1
+            '            FDir = FaceDir.Left
+            '        End If
+            '    End If
+            '    ' stopping walk
+            '    'stopping left
+            '    If FrameIdx = 0 And PosX >= PosX + Vx Then
+            '        isWalking = False
+            '        State(StateArmoredArmadillo.StandArmored, 0)
+            '        'stopping right
+            '    ElseIf CurrFrame = 0 And PosX <= PosX + Vx Then
+            '        isWalking = False
+            '        State(StateArmoredArmadillo.StandArmored, 0)
+            '    End If
+            '    GetNextFrame()
             Case StateArmoredArmadillo.IntroAnimation
                 GetNextFrame()
                 If CurrFrame = 4 And FrameIdx = 6 Then
@@ -320,6 +320,8 @@ Public Class CCharArmoredArmadillo
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 If FrameIdx = 5 And CurrFrame = 1 And AAHitbox.Bottom >= 255 Then
+                    Events(4) = False
+                    isGuarding = False
                     Events(0) = False
                     Events(5) = False
                     State(StateArmoredArmadillo.StandArmored, 0)
@@ -788,7 +790,7 @@ Public Class CCharMegaman
                 PosY = 237
                 Vy = -12
                 Dim Rnd As New Random
-                Dim RandomizedVx As Integer = Rnd.Next(0, 7)
+                Dim RandomizedVx As Integer = Rnd.Next(5, 10)
                 If FDir = FaceDir.Right Then
                     Vx = RandomizedVx
                 Else
@@ -873,7 +875,7 @@ Public Class CCharMegamanProjectile
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 If PosX >= AAHitbox.Left And PosX <= AAHitbox.Right And PosY >= AAHitbox.Top And PosY <= AAHitbox.Bottom And Not Events(5) Then
-                    If Events(4) = True Then
+                    If Events(4) And ((Vx < 0 And AAHitbox.FDir = FaceDir.Right) Or (Vx > 0 And AAHitbox.FDir = FaceDir.Left)) Then
                         Dim rnd As New Random
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(30, 60 + 1)
@@ -942,6 +944,7 @@ Public Class HitboxClass
     Public CtrPoint As TPoint
     Public Top, Bottom, Left, Right As Integer
     Public relativeDistance(4) As Integer
+    Public FDir As FaceDir
 
     Public Sub UpdateHitbox(ByRef character As CCharacter)
         Dim CurrSprite As CElmtFrame = character.ArrSprites(character.IdxArrSprites).Elmt(character.FrameIdx)
@@ -949,6 +952,8 @@ Public Class HitboxClass
 
         CtrPoint.x = character.PosX
         CtrPoint.y = character.PosY
+
+        FDir = character.FDir
 
         Top = character.PosY - relativeDistance(1)
         Bottom = character.PosY + relativeDistance(3)
