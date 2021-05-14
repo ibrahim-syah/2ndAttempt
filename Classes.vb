@@ -13,6 +13,7 @@ Public Enum StateArmoredArmadillo
     RollingRecoveryArmored
     RollingRecoveryEndArmored
     FreeFalling
+    DeflectSpecial
 End Enum
 
 Public Enum StateMegaman
@@ -32,6 +33,7 @@ Public Enum StateArmoredArmadilloProjectile
     Create
     Horizontal
     Hit
+    EightWay
 End Enum
 
 Public Enum StateMegamanProjectile
@@ -284,9 +286,20 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
 
             Case StateArmoredArmadillo.Guard
-                'TODO: create a hit event and deflect state
                 If isGuarding = False Then
                     State(StateArmoredArmadillo.StandArmored, 0)
+                End If
+                If Events(7) Then
+                    State(StateArmoredArmadillo.DeflectSpecial, 12)
+                End If
+                GetNextFrame()
+
+            Case StateArmoredArmadillo.DeflectSpecial
+                If FrameIdx = 9 And CurrFrame = 4 Then
+                    State(StateArmoredArmadillo.StandArmored, 0)
+                    Events(4) = False
+                    isGuarding = False
+                    Events(7) = False
                 End If
                 GetNextFrame()
 
@@ -623,6 +636,18 @@ Public Class CCharArmoredArmadilloProjectile
                     Vx = 6
                 End If
 
+            Case StateArmoredArmadilloProjectile.EightWay
+                GetNextFrame()
+                PosX = PosX + Vx
+                PosY = PosY + Vy
+                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
+                    State(StateArmoredArmadilloProjectile.Hit, 2)
+                    Events(1) = True 'MM is hit
+                End If
+                If PosX >= 320 Or PosX <= 20 Or PosY <= 18 Or PosY >= 255 Then
+                    State(StateArmoredArmadilloProjectile.Hit, 2)
+                End If
+
             Case StateArmoredArmadilloProjectile.Hit
                 If FrameIdx = 3 And CurrFrame = 0 Then
                     Destroy = True
@@ -762,7 +787,13 @@ Public Class CCharMegaman
             Case StateMegaman.JumpStart
                 PosY = 237
                 Vy = -12
-                Vx = 0
+                Dim Rnd As New Random
+                Dim RandomizedVx As Integer = Rnd.Next(0, 7)
+                If FDir = FaceDir.Right Then
+                    Vx = RandomizedVx
+                Else
+                    Vx = RandomizedVx * -1
+                End If
                 GetNextFrame()
                 If CurrFrame = 2 Then
                     State(StateMegaman.Jump, 5)
@@ -772,6 +803,13 @@ Public Class CCharMegaman
                 PosY = PosY + Vy
                 Vy = Vy + gravity
                 GetNextFrame()
+                If MMHitbox.Right >= 323 Then
+                    Vx = 0
+                    PosX = 323 - MMHitbox.relativeDistance(2)
+                ElseIf MMHitbox.Left <= 22 Then
+                    Vx = 0
+                    PosX = 22 + MMHitbox.relativeDistance(0)
+                End If
                 If Vy >= 0 Then
                     State(StateMegaman.JumpDown, 8)
                 End If
@@ -779,6 +817,13 @@ Public Class CCharMegaman
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 Vy = Vy + gravity
+                If MMHitbox.Right >= 323 Then
+                    Vx = 0
+                    PosX = 323 - MMHitbox.relativeDistance(2)
+                ElseIf MMHitbox.Left <= 22 Then
+                    Vx = 0
+                    PosX = 22 + MMHitbox.relativeDistance(0)
+                End If
                 GetNextFrame()
                 If MMHitbox.Bottom >= 255 Then
                     State(StateMegaman.JumpEnd, 6)
@@ -844,6 +889,7 @@ Public Class CCharMegamanProjectile
                         Else
                             FDir = FaceDir.Left
                         End If
+                        Events(7) = True
                     Else
                         State(StateMegamanProjectile.Hit, 2)
                         Events(0) = True 'AA is hit
