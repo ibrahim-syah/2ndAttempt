@@ -27,6 +27,7 @@ Public Class Form1
     Dim AA As CCharArmoredArmadillo
     Dim MM As CCharMegaman
     Dim Hitbox(2, 4) As Integer 'collision points (left, up, right, down) of AA (0-3) and MM (4-7)
+    Dim AllCharHitboxes As Hitboxes
     Dim Events(6) As Boolean 'Hold certain flags and triggers e.g. 0 is AA getting hit, 1 is MM getting hit
 
 

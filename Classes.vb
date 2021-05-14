@@ -167,8 +167,6 @@ Public Class CCharacter
 
     Public Const gravity = 1
 
-    'Public CurrState as ?
-
     Public Sub GetNextFrame()
         CurrFrame = CurrFrame + 1
         If CurrFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx).MaxFrameTime Then
@@ -210,11 +208,18 @@ Public Class CCharArmoredArmadillo
 
 
     Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-        Dim EF As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
-        Hitbox(0, 0) = PosX - 20
-        Hitbox(0, 1) = PosY - 20
-        Hitbox(0, 2) = PosX + 20
-        Hitbox(0, 3) = PosY + 20
+        Dim CurrSprite As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
+        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
+
+        Hitbox(0, 1) = PosY - relativeDistance(1)
+        Hitbox(0, 3) = PosY + relativeDistance(3)
+        If FDir = FaceDir.Left Then
+            Hitbox(0, 0) = PosX - relativeDistance(0)
+            Hitbox(0, 2) = PosX + relativeDistance(2)
+        Else
+            Hitbox(0, 0) = PosX - relativeDistance(2)
+            Hitbox(0, 2) = PosX + relativeDistance(0)
+        End If
         If Events(0) And Not Events(5) Then
             If Hitbox(0, 0) < Hitbox(1, 0) And Hitbox(0, 2) < Hitbox(1, 2) Then
                 'shot from the right
@@ -292,6 +297,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
 
             Case StateArmoredArmadillo.StaggeredArmored
+                isInRollingAnimation = False 'in case aa was hit when jumping or when recovering from rolling
                 If PosX >= 300 Then
                     PosX = 299
                     Vx = 0
@@ -299,9 +305,14 @@ Public Class CCharArmoredArmadillo
                     PosX = 46
                     Vx = 0
                 End If
-                PosY = PosY + Vy
+                If PosY >= 238 Then
+                    Vy = 0
+                Else
+                    Vy = Vy + gravity
+                End If
                 PosX = PosX + Vx
-                If FrameIdx = 5 And CurrFrame = 1 Then
+                PosY = PosY + Vy
+                If FrameIdx = 5 And CurrFrame = 1 And PosY >= 238 Then
                     Events(0) = False
                     Events(5) = False
                     State(StateArmoredArmadillo.StandArmored, 0)
@@ -643,10 +654,18 @@ Public Class CCharMegaman
 
 
     Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-        Hitbox(1, 0) = PosX - 20
-        Hitbox(1, 1) = PosY - 20
-        Hitbox(1, 2) = PosX + 20
-        Hitbox(1, 3) = PosY + 20
+        Dim CurrSprite As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
+        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
+
+        Hitbox(1, 1) = PosY - relativeDistance(1)
+        Hitbox(1, 3) = PosY + relativeDistance(3)
+        If FDir = FaceDir.Left Then
+            Hitbox(1, 0) = PosX - relativeDistance(0)
+            Hitbox(1, 2) = PosX + relativeDistance(2)
+        Else
+            Hitbox(1, 0) = PosX - relativeDistance(2)
+            Hitbox(1, 2) = PosX + relativeDistance(0)
+        End If
         If Events(1) And Not Events(3) Then
             Vy = -10
             If Hitbox(0, 0) > Hitbox(1, 0) And Hitbox(0, 2) > Hitbox(1, 2) Then
@@ -690,7 +709,7 @@ Public Class CCharMegaman
                     State(StateMegaman.Run, 1)
                 Else
                     Dim rnd As New Random()
-                    If rnd.NextDouble() < 0.5 Then
+                    If rnd.NextDouble() < 0.7 Then
                         State(StateMegaman.Shoot, 2)
                     Else
                         State(StateMegaman.JumpStart, 4)
@@ -832,21 +851,55 @@ End Class
 
 
 Public Class CElmtFrame
-  Public CtrPoint As TPoint
-  Public Top, Bottom, Left, Right As Integer
+    Public CtrPoint As TPoint
+    Public Top, Bottom, Left, Right As Integer
+    Public RelativeDistance(4) As Integer 'for the current sprite, give the relative distance of l,t,r,b from ctrpoint
 
-  Public MaxFrameTime As Integer
+    Public MaxFrameTime As Integer
 
-  Public Sub New(ctrx As Integer, ctry As Integer, l As Integer, t As Integer, r As Integer, b As Integer, mft As Integer)
-    CtrPoint.x = ctrx
-    CtrPoint.y = ctry
-    Top = t
-    Bottom = b
-    Left = l
-    Right = r
-    MaxFrameTime = mft
+    Public Sub New(ctrx As Integer, ctry As Integer, l As Integer, t As Integer, r As Integer, b As Integer, mft As Integer)
+        CtrPoint.x = ctrx
+        CtrPoint.y = ctry
+        Top = t
+        Bottom = b
+        Left = l
+        Right = r
+        MaxFrameTime = mft
+        RelativeDistance(0) = CtrPoint.x - Left
+        RelativeDistance(1) = CtrPoint.y - Top
+        RelativeDistance(2) = Right - CtrPoint.x
+        RelativeDistance(3) = Bottom - CtrPoint.y
+    End Sub
+End Class
 
-  End Sub
+Public Class HitboxClass
+    'derived from CElmtFrame class, but fixes the left and right boundaries accordingly (e.g. takes into account whether the 
+    'character object was facing to the left (uses default attributes of CElmtFrame since the spritesheet is left-facing) or otherwise)
+    Public CtrPoint As TPoint
+    Public Top, Bottom, Left, Right As Integer
+
+    Public Sub UpdateHitbox(ByRef character As CCharacter)
+        Dim CurrSprite As CElmtFrame = character.ArrSprites(character.IdxArrSprites).Elmt(character.FrameIdx)
+        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
+
+        Top = character.PosY - relativeDistance(1)
+        Bottom = character.PosY + relativeDistance(3)
+        If character.FDir = FaceDir.Left Then
+            Left = character.PosX - relativeDistance(0)
+            Right = character.PosX + relativeDistance(2)
+        Else
+            Left = character.PosX - relativeDistance(2)
+            Right = character.PosX + relativeDistance(0)
+        End If
+    End Sub
+End Class
+
+Public Class Hitboxes
+    'could've just use array, but this helps differentiating the two char as opposed to just use 0 for AA and 1 for MM, for instance
+    Public ArmoredArmadilloHitbox As HitboxClass
+    Public MegamanHitbox As HitboxClass
+
+    'just think of this as c struct, idk if it exists here but im too lazy to find out
 End Class
 
 Public Class CArrFrame
