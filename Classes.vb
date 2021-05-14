@@ -25,6 +25,7 @@ Public Enum StateMegaman
     JumpEnd
     Stand
     JumpDown
+    Staggered
 End Enum
 
 Public Enum StateArmoredArmadilloProjectile
@@ -223,6 +224,9 @@ Public Class CCharArmoredArmadillo
             Vy = 0
             Events(5) = True
             State(StateArmoredArmadillo.StaggeredArmored, 5)
+        End If
+        If PosX <= MMHitbox.Right And PosX >= MMHitbox.Left And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Not Events(3) Then
+            Events(6) = True
         End If
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
@@ -659,6 +663,19 @@ Public Class CCharMegaman
                 FDir = FaceDir.Left
             End If
             State(StateMegaman.Die, 3)
+            Events(6) = False 'rolling towards mm technically triggers this event as well
+        ElseIf Events(6) And Not Events(3) Then
+            If AAHitbox.CtrPoint.x > MMHitbox.CtrPoint.x Then
+                'bodied from the right
+                Vx = -5
+                FDir = FaceDir.Right
+            Else
+                'bodied from the left
+                Vx = 5
+                FDir = FaceDir.Left
+            End If
+            Vy = 0
+            State(StateMegaman.Staggered, 9)
         End If
         Select Case CurrState
             Case StateMegaman.Spawn
@@ -708,6 +725,32 @@ Public Class CCharMegaman
                     Events(1) = False ' MM is hit
                     Events(2) = False 'MM is dead
                     Destroy = True
+                End If
+
+            Case StateMegaman.Staggered
+                GetNextFrame()
+                Events(3) = True 'no collision in this state
+                If MMHitbox.Right >= 323 Then
+                    PosX = 323 - MMHitbox.relativeDistance(2)
+                    Vx = 0
+                ElseIf MMHitbox.Left <= 22 Then
+                    PosX = 22 + MMHitbox.relativeDistance(0)
+                    Vx = 0
+                End If
+                If MMHitbox.Bottom >= 255 Then
+                    Vy = 0
+                    PosY = 255 - MMHitbox.relativeDistance(3)
+                Else
+                    Vy = Vy + gravity
+                End If
+                PosX = PosX + Vx
+                PosY = PosY + Vy
+                If FrameIdx = 0 And CurrFrame = 7 And MMHitbox.Bottom >= 255 Then
+                    Events(6) = False
+                    Events(3) = False
+                    Vx = 0
+                    PosY = 238
+                    State(StateMegaman.Stand, 7)
                 End If
 
             Case StateMegaman.Shoot

@@ -21,7 +21,7 @@ Public Class Form1
         AA_RollingRecoveryArmored,
         AA_RollingRecoveryEndArmored As CArrFrame
     Dim AA_ProjCreate1, AA_ProjHorizontal, AA_ProjHit As CArrFrame
-    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Die, MM_Stand, MM_JumpDown As CArrFrame
+    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Die, MM_Stand, MM_JumpDown, MM_Staggered As CArrFrame
     Dim MM_ProjCreate1, MM_ProjHorizontal, MM_ProjHit As CArrFrame
     Dim ListChar As New List(Of CCharacter)
     Dim AA As CCharArmoredArmadillo
@@ -140,11 +140,12 @@ Public Class Form1
         ListChar.Add(AA)
 
         Events(0) = False 'is AA getting hit?
-        Events(1) = False 'is MM getting hit?
+        Events(1) = False 'is MM getting hit by projectile or roll?
         Events(2) = False 'is MM alive?
         Events(3) = False 'is MM invincible (collision will not be registered)?
         Events(4) = False 'is AA guarding/rolling (projectile will be deflected)?
         Events(5) = True 'is AA invincible (collision will not be registered)?
+        Events(6) = False 'is MM staggered by AA's body?
 
         'initialize sprites for Sprite Projectiles
         AA_ProjCreate1 = New CArrFrame
@@ -201,6 +202,9 @@ Public Class Form1
         MM_Die.Insert(358, 658, 342, 643, 372, 678, 2)
         MM_Die.Insert(657, 803, 651, 794, 674, 812, 2)
         MM_Die.Insert(358, 658, 342, 643, 372, 678, 8)
+
+        MM_Staggered = New CArrFrame
+        MM_Staggered.Insert(399, 659, 385, 643, 412, 678, 8)
 
         MM_JumpStart = New CArrFrame
         MM_JumpStart.Insert(269, 775, 255, 759, 285, 792, 3)
@@ -516,7 +520,7 @@ Public Class Form1
 
         MM.Vy = 0
         MM.State(StateMegaman.Spawn, 0)
-        ReDim MM.ArrSprites(9)
+        ReDim MM.ArrSprites(10)
         MM.ArrSprites(0) = MM_Spawn
         MM.ArrSprites(1) = MM_Run
         MM.ArrSprites(2) = MM_Shoot
@@ -526,6 +530,7 @@ Public Class Form1
         MM.ArrSprites(6) = MM_JumpEnd
         MM.ArrSprites(7) = MM_Stand
         MM.ArrSprites(8) = MM_JumpDown
+        MM.ArrSprites(9) = MM_Staggered
         ListChar.Add(MM)
     End Sub
 
