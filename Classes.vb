@@ -19,7 +19,7 @@ Public Enum StateMegaman
     Spawn
     Run
     Shoot
-    Staggered
+    Die
     JumpStart
     Jump
     JumpEnd
@@ -180,7 +180,7 @@ Public Class CCharacter
 
     End Sub
 
-    Public Overridable Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
+    Public Overridable Sub Update(ByRef AllCharHitboxes As Hitboxes, ByRef Events() As Boolean)
 
     End Sub
 
@@ -207,25 +207,15 @@ Public Class CCharArmoredArmadillo
     End Sub
 
 
-    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-        Dim CurrSprite As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
-        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
-
-        Hitbox(0, 1) = PosY - relativeDistance(1)
-        Hitbox(0, 3) = PosY + relativeDistance(3)
-        If FDir = FaceDir.Left Then
-            Hitbox(0, 0) = PosX - relativeDistance(0)
-            Hitbox(0, 2) = PosX + relativeDistance(2)
-        Else
-            Hitbox(0, 0) = PosX - relativeDistance(2)
-            Hitbox(0, 2) = PosX + relativeDistance(0)
-        End If
+    Public Overrides Sub Update(ByRef AllCharHitboxes As Hitboxes, ByRef Events() As Boolean)
+        Dim MMHitbox As HitboxClass = AllCharHitboxes.MegamanHitbox
+        Dim AAHitbox As HitboxClass = AllCharHitboxes.ArmoredArmadilloHitbox
         If Events(0) And Not Events(5) Then
-            If Hitbox(0, 0) < Hitbox(1, 0) And Hitbox(0, 2) < Hitbox(1, 2) Then
+            If AAHitbox.CtrPoint.x < MMHitbox.CtrPoint.x Then
                 'shot from the right
                 Vx = -1
                 FDir = FaceDir.Right
-            ElseIf Hitbox(0, 0) > Hitbox(1, 0) And Hitbox(0, 2) > Hitbox(1, 2) Then
+            Else
                 'shot from the left
                 Vx = 1
                 FDir = FaceDir.Left
@@ -251,7 +241,7 @@ Public Class CCharArmoredArmadillo
                 If FDir = FaceDir.Left And isWalking = True Then
                     Vx = -5
                     PosX = PosX + Vx
-                    If PosX <= 45 Then
+                    If AAHitbox.Left <= 22 Then
                         Vx *= -1
                         FDir = FaceDir.Right
                     End If
@@ -259,7 +249,7 @@ Public Class CCharArmoredArmadillo
                 ElseIf FDir = FaceDir.Right And isWalking = True Then
                     Vx = 5
                     PosX = PosX + Vx
-                    If PosX >= 300 Then
+                    If AAHitbox.Right >= 323 Then
                         Vx *= -1
                         FDir = FaceDir.Left
                     End If
@@ -298,21 +288,21 @@ Public Class CCharArmoredArmadillo
 
             Case StateArmoredArmadillo.StaggeredArmored
                 isInRollingAnimation = False 'in case aa was hit when jumping or when recovering from rolling
-                If PosX >= 300 Then
-                    PosX = 299
+                If AAHitbox.Right >= 323 Then
+                    PosX = 323 - AAHitbox.relativeDistance(2)
                     Vx = 0
-                ElseIf PosX <= 45 Then
-                    PosX = 46
+                ElseIf AAHitbox.Left <= 22 Then
+                    PosX = 22 + AAHitbox.relativeDistance(0)
                     Vx = 0
                 End If
-                If PosY >= 238 Then
+                If AAHitbox.Bottom >= 255 Then
                     Vy = 0
                 Else
                     Vy = Vy + gravity
                 End If
                 PosX = PosX + Vx
                 PosY = PosY + Vy
-                If FrameIdx = 5 And CurrFrame = 1 And PosY >= 238 Then
+                If FrameIdx = 5 And CurrFrame = 1 And AAHitbox.Bottom >= 255 Then
                     Events(0) = False
                     Events(5) = False
                     State(StateArmoredArmadillo.StandArmored, 0)
@@ -338,7 +328,7 @@ Public Class CCharArmoredArmadillo
                 PosY = PosY + Vy
                 Vy = Vy + gravity
                 GetNextFrame()
-                If PosY >= 238 And Vy > 0 Then
+                If AAHitbox.Bottom >= 255 And Vy > 0 Then
                     Events(4) = True
                     Vy = 0
                     State(StateArmoredArmadillo.Rolling, 9)
@@ -353,14 +343,14 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.Rolling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
+                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
                     Events(1) = True 'MM is hit
                 End If
                 If isIntro Then
                     PosY = PosY + Vy
                     Vy = Vy + gravity
-                    If PosY >= 239 Then
-                        PosY = 238
+                    If AAHitbox.Bottom >= 255 Then
+                        PosY = (255 - AAHitbox.relativeDistance(3))
                         Vy = -12
                         State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                     End If
@@ -368,8 +358,8 @@ Public Class CCharArmoredArmadillo
                 ElseIf FDir = FaceDir.Left Then
                     PosX = PosX + Vx
                     PosY = PosY + Vy
-                    If PosX <= 30 Then
-                        PosX = 31
+                    If AAHitbox.Left <= 22 Then
+                        PosX = 22 + AAHitbox.relativeDistance(0)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -389,8 +379,8 @@ Public Class CCharArmoredArmadillo
                             State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
 
-                    ElseIf PosY <= 30 Then
-                        PosY = 31
+                    ElseIf AAHitbox.Top <= 18 Then
+                        PosY = 18 + AAHitbox.relativeDistance(1)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 240
@@ -403,8 +393,8 @@ Public Class CCharArmoredArmadillo
                         If rnd.NextDouble() < 0.2 Then
                             State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
-                    ElseIf PosY >= 250 Then
-                        PosY = 249
+                    ElseIf AAHitbox.Bottom >= 255 Then
+                        PosY = 255 - AAHitbox.relativeDistance(3)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 150
@@ -422,8 +412,8 @@ Public Class CCharArmoredArmadillo
                 ElseIf FDir = FaceDir.Right Then
                     PosX = PosX + Vx
                     PosY = PosY + Vy
-                    If PosX >= 310 Then
-                        PosX = 309
+                    If AAHitbox.Right >= 323 Then
+                        PosX = 323 - AAHitbox.relativeDistance(2)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -443,8 +433,8 @@ Public Class CCharArmoredArmadillo
                             State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
 
-                    ElseIf PosY <= 30 Then
-                        PosY = 31
+                    ElseIf AAHitbox.Top <= 18 Then
+                        PosY = 18 + AAHitbox.relativeDistance(1)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 330
@@ -457,8 +447,8 @@ Public Class CCharArmoredArmadillo
                         If rnd.NextDouble() < 0.2 Then
                             State(StateArmoredArmadillo.FreeFalling, 9)
                         End If
-                    ElseIf PosY >= 250 Then
-                        PosY = 249
+                    ElseIf AAHitbox.Bottom >= 255 Then
+                        PosY = 255 - AAHitbox.relativeDistance(3)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 60
@@ -477,10 +467,10 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
+                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
                     Events(1) = True 'MM is hit
                 End If
-                If PosY >= 250 Then
+                If AAHitbox.Bottom >= 255 Then
                     PosY = 249
                     Vy = -12
                     Vx = 0
@@ -492,8 +482,8 @@ Public Class CCharArmoredArmadillo
                     PosX = PosX + Vx
                     PosY = PosY + Vy
                     Vy = Vy + gravity
-                    If PosX <= 30 Then
-                        PosX = 31
+                    If AAHitbox.Left <= 22 Then
+                        PosX = 22 + AAHitbox.relativeDistance(0)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -510,8 +500,8 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Right
 
-                    ElseIf PosY <= 30 Then
-                        PosY = 31
+                    ElseIf AAHitbox.Top <= 18 Then
+                        PosY = 18 + AAHitbox.relativeDistance(1)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 240
@@ -527,8 +517,8 @@ Public Class CCharArmoredArmadillo
                     PosX = PosX + Vx
                     PosY = PosY + Vy
                     Vy = Vy + gravity
-                    If PosX >= 310 Then
-                        PosX = 309
+                    If AAHitbox.Right >= 323 Then
+                        PosX = 323 - AAHitbox.relativeDistance(2)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         If Vy <= 0 Then
@@ -545,8 +535,8 @@ Public Class CCharArmoredArmadillo
                         Vy = Velocity(1) * -1
                         FDir = FaceDir.Left
 
-                    ElseIf PosY <= 30 Then
-                        PosY = 31
+                    ElseIf AAHitbox.Top <= 18 Then
+                        PosY = 18 + AAHitbox.relativeDistance(1)
 
                         Dim lowerBoundAngle, upperBoundAngle As Integer
                         upperBoundAngle = 330
@@ -561,7 +551,7 @@ Public Class CCharArmoredArmadillo
 
             Case StateArmoredArmadillo.RollingRecoveryArmored
                 GetNextFrame()
-                If FrameIdx = 6 Or PosY >= 239 Then
+                If FrameIdx = 6 Then
                     State(StateArmoredArmadillo.RollingRecoveryEndArmored, 11)
                 End If
                 PosX = PosX + Vx
@@ -569,9 +559,9 @@ Public Class CCharArmoredArmadillo
                 Vy = Vy + gravity
 
             Case StateArmoredArmadillo.RollingRecoveryEndArmored
-                If PosY >= 238 And Vy >= 0 Then
+                If AAHitbox.Bottom >= 255 And Vy >= 0 Then
                     State(StateArmoredArmadillo.StandArmored, 0)
-                    PosY = 238
+                    PosY = 234
                     Vx = 0
                     Vy = 0
                     If isIntro Then
@@ -603,8 +593,9 @@ Public Class CCharArmoredArmadilloProjectile
 
     End Sub
 
-    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-
+    Public Overrides Sub Update(ByRef AllCharHitboxes As Hitboxes, ByRef Events() As Boolean)
+        Dim MMHitbox As HitboxClass = AllCharHitboxes.MegamanHitbox
+        Dim AAHitbox As HitboxClass = AllCharHitboxes.ArmoredArmadilloHitbox
         Select Case CurrState
             Case StateArmoredArmadilloProjectile.Create
                 GetNextFrame()
@@ -615,7 +606,7 @@ Public Class CCharArmoredArmadilloProjectile
             Case StateArmoredArmadilloProjectile.Horizontal
                 GetNextFrame()
                 PosX = PosX + Vx
-                If PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Events(3) = False Then
+                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
                     State(StateArmoredArmadilloProjectile.Hit, 2)
                     Events(1) = True 'MM is hit
                 End If
@@ -653,41 +644,24 @@ Public Class CCharMegaman
     End Sub
 
 
-    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-        Dim CurrSprite As CElmtFrame = ArrSprites(IdxArrSprites).Elmt(FrameIdx)
-        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
-
-        Hitbox(1, 1) = PosY - relativeDistance(1)
-        Hitbox(1, 3) = PosY + relativeDistance(3)
-        If FDir = FaceDir.Left Then
-            Hitbox(1, 0) = PosX - relativeDistance(0)
-            Hitbox(1, 2) = PosX + relativeDistance(2)
-        Else
-            Hitbox(1, 0) = PosX - relativeDistance(2)
-            Hitbox(1, 2) = PosX + relativeDistance(0)
-        End If
+    Public Overrides Sub Update(ByRef AllCharHitboxes As Hitboxes, ByRef Events() As Boolean)
+        Dim MMHitbox As HitboxClass = AllCharHitboxes.MegamanHitbox
+        Dim AAHitbox As HitboxClass = AllCharHitboxes.ArmoredArmadilloHitbox
         If Events(1) And Not Events(3) Then
             Vy = -10
-            If Hitbox(0, 0) > Hitbox(1, 0) And Hitbox(0, 2) > Hitbox(1, 2) Then
+            If AAHitbox.CtrPoint.x > MMHitbox.CtrPoint.x Then
                 'shot from the right
                 Vx = -5
                 FDir = FaceDir.Right
-            ElseIf Hitbox(0, 0) < Hitbox(1, 0) And Hitbox(0, 2) < Hitbox(1, 2) Then
+            Else
                 'shot from the left
                 Vx = 5
                 FDir = FaceDir.Left
             End If
-            State(StateMegaman.Staggered, 3)
+            State(StateMegaman.Die, 3)
         End If
         Select Case CurrState
             Case StateMegaman.Spawn
-                If PosX >= Hitbox(0, 0) - 10 And PosX <= Hitbox(0, 2) + 10 Then
-                    If PosX >= 164 Then
-                        PosX = PosX - 50
-                    Else
-                        PosX = PosX + 50
-                    End If
-                End If
 
                 If FrameIdx = 7 And CurrFrame = 1 Then
                     Events(3) = False
@@ -696,7 +670,7 @@ Public Class CCharMegaman
                 GetNextFrame()
 
             Case StateMegaman.Stand
-                If Hitbox(0, 0) >= Hitbox(1, 0) Then
+                If AAHitbox.CtrPoint.x >= MMHitbox.CtrPoint.x Then
                     'AA is to the right of MM
                     Vx = 5
                     FDir = FaceDir.Right
@@ -705,11 +679,11 @@ Public Class CCharMegaman
                     Vx = -5
                     FDir = FaceDir.Left
                 End If
-                If Math.Abs(Hitbox(0, 0) - Hitbox(1, 0)) >= 150 Then
+                If Math.Abs(AAHitbox.CtrPoint.x - MMHitbox.CtrPoint.x) >= 150 Then
                     State(StateMegaman.Run, 1)
                 Else
                     Dim rnd As New Random()
-                    If rnd.NextDouble() < 0.7 Then
+                    If rnd.NextDouble() < 0.5 Then
                         State(StateMegaman.Shoot, 2)
                     Else
                         State(StateMegaman.JumpStart, 4)
@@ -718,13 +692,13 @@ Public Class CCharMegaman
                 GetNextFrame()
 
             Case StateMegaman.Run
-                If Math.Abs(Hitbox(0, 0) - Hitbox(1, 0)) <= 150 Then
+                If Math.Abs(AAHitbox.CtrPoint.x - MMHitbox.CtrPoint.x) <= 150 Then
                     State(StateMegaman.Shoot, 2)
                 End If
                 PosX = PosX + Vx
                 GetNextFrame()
 
-            Case StateMegaman.Staggered
+            Case StateMegaman.Die
                 GetNextFrame()
                 Events(3) = True 'no collision in this state
                 PosY = PosY + Vy
@@ -763,7 +737,7 @@ Public Class CCharMegaman
                 PosY = PosY + Vy
                 Vy = Vy + gravity
                 GetNextFrame()
-                If PosY >= 238 Then
+                If MMHitbox.Bottom >= 255 Then
                     State(StateMegaman.JumpEnd, 6)
                 End If
 
@@ -791,8 +765,9 @@ Public Class CCharMegamanProjectile
 
     End Sub
 
-    Public Overrides Sub Update(ByRef Hitbox(,) As Integer, ByRef Events() As Boolean)
-
+    Public Overrides Sub Update(ByRef AllCharHitboxes As Hitboxes, ByRef Events() As Boolean)
+        Dim MMHitbox As HitboxClass = AllCharHitboxes.MegamanHitbox
+        Dim AAHitbox As HitboxClass = AllCharHitboxes.ArmoredArmadilloHitbox
         Select Case CurrState
             Case StateMegamanProjectile.Create
                 GetNextFrame()
@@ -809,7 +784,7 @@ Public Class CCharMegamanProjectile
                 GetNextFrame()
                 PosX = PosX + Vx
                 PosY = PosY + Vy
-                If PosX >= Hitbox(0, 0) And PosX <= Hitbox(0, 2) And PosY >= Hitbox(0, 1) And PosY <= Hitbox(0, 3) And Not Events(5) Then
+                If PosX >= AAHitbox.Left And PosX <= AAHitbox.Right And PosY >= AAHitbox.Top And PosY <= AAHitbox.Bottom And Not Events(5) Then
                     If Events(4) = True Then
                         Dim rnd As New Random
                         ' Generate random value between the two angle
@@ -830,7 +805,7 @@ Public Class CCharMegamanProjectile
                         State(StateMegamanProjectile.Hit, 2)
                         Events(0) = True 'AA is hit
                     End If
-                ElseIf PosX >= Hitbox(1, 0) And PosX <= Hitbox(1, 2) And PosY >= Hitbox(1, 1) And PosY <= Hitbox(1, 3) And Not Events(3) Then
+                ElseIf PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Not Events(3) Then
                     State(StateMegamanProjectile.Hit, 2)
                     Events(1) = True 'MM is hit by the deflected projectile
                 End If
@@ -877,10 +852,14 @@ Public Class HitboxClass
     'character object was facing to the left (uses default attributes of CElmtFrame since the spritesheet is left-facing) or otherwise)
     Public CtrPoint As TPoint
     Public Top, Bottom, Left, Right As Integer
+    Public relativeDistance(4) As Integer
 
     Public Sub UpdateHitbox(ByRef character As CCharacter)
         Dim CurrSprite As CElmtFrame = character.ArrSprites(character.IdxArrSprites).Elmt(character.FrameIdx)
-        Dim relativeDistance As Integer() = CurrSprite.RelativeDistance
+        relativeDistance = CurrSprite.RelativeDistance
+
+        CtrPoint.x = character.PosX
+        CtrPoint.y = character.PosY
 
         Top = character.PosY - relativeDistance(1)
         Bottom = character.PosY + relativeDistance(3)

@@ -21,13 +21,12 @@ Public Class Form1
         AA_RollingRecoveryArmored,
         AA_RollingRecoveryEndArmored As CArrFrame
     Dim AA_ProjCreate1, AA_ProjHorizontal, AA_ProjHit As CArrFrame
-    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Staggered, MM_Died, MM_Stand, MM_JumpDown As CArrFrame
+    Dim MM_Spawn, MM_Run, MM_Shoot, MM_JumpStart, MM_Jump, MM_JumpEnd, MM_Die, MM_Stand, MM_JumpDown As CArrFrame
     Dim MM_ProjCreate1, MM_ProjHorizontal, MM_ProjHit As CArrFrame
     Dim ListChar As New List(Of CCharacter)
     Dim AA As CCharArmoredArmadillo
     Dim MM As CCharMegaman
-    Dim Hitbox(2, 4) As Integer 'collision points (left, up, right, down) of AA (0-3) and MM (4-7)
-    Dim AllCharHitboxes As Hitboxes
+    Dim AllCharHitboxes As New Hitboxes
     Dim Events(6) As Boolean 'Hold certain flags and triggers e.g. 0 is AA getting hit, 1 is MM getting hit
 
 
@@ -193,15 +192,15 @@ Public Class Form1
         MM_Shoot.Insert(492, 660, 477, 644, 508, 679, 3)
         MM_Shoot.Insert(446, 659, 431, 643, 461, 678, 2)
 
-        MM_Staggered = New CArrFrame
-        MM_Staggered.Insert(399, 659, 385, 643, 412, 678, 2)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 2)
-        MM_Staggered.Insert(657, 803, 651, 794, 674, 812, 2)
-        MM_Staggered.Insert(358, 658, 342, 643, 372, 678, 8)
+        MM_Die = New CArrFrame
+        MM_Die.Insert(399, 659, 385, 643, 412, 678, 2)
+        MM_Die.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Die.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Die.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Die.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Die.Insert(358, 658, 342, 643, 372, 678, 2)
+        MM_Die.Insert(657, 803, 651, 794, 674, 812, 2)
+        MM_Die.Insert(358, 658, 342, 643, 372, 678, 8)
 
         MM_JumpStart = New CArrFrame
         MM_JumpStart.Insert(269, 775, 255, 759, 285, 792, 3)
@@ -241,6 +240,12 @@ Public Class Form1
 
 
         bmp = New Bitmap(Img.Width, Img.Height)
+
+        Dim MMHitbox = New HitboxClass
+        Dim AAHitbox = New HitboxClass
+        AllCharHitboxes.MegamanHitbox = MMHitbox
+        AllCharHitboxes.ArmoredArmadilloHitbox = AAHitbox
+
 
 
         DisplayImg()
@@ -433,9 +438,10 @@ Public Class Form1
         PictureBox1.Refresh()
 
         For Each CC In ListChar
-            CC.Update(Hitbox, Events)
-
+            CC.Update(AllCharHitboxes, Events)
         Next
+
+        AllCharHitboxes.ArmoredArmadilloHitbox.UpdateHitbox(AA)
 
         If AA.CurrState = StateArmoredArmadillo.ShootArmored And AA.CurrFrame = 2 Then
             CreateArmoredArmadilloProjectile()
@@ -444,6 +450,7 @@ Public Class Form1
         If Events(2) = False Then
             SpawnMegaman(MM)
         Else
+            AllCharHitboxes.MegamanHitbox.UpdateHitbox(MM)
             If MM.CurrState = StateMegaman.Shoot And MM.CurrFrame = 2 Then
                 CreateMegamanProjectile()
             End If
@@ -513,7 +520,7 @@ Public Class Form1
         MM.ArrSprites(0) = MM_Spawn
         MM.ArrSprites(1) = MM_Run
         MM.ArrSprites(2) = MM_Shoot
-        MM.ArrSprites(3) = MM_Staggered
+        MM.ArrSprites(3) = MM_Die
         MM.ArrSprites(4) = MM_JumpStart
         MM.ArrSprites(5) = MM_Jump
         MM.ArrSprites(6) = MM_JumpEnd
