@@ -627,8 +627,10 @@ Public Class Form1
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isGuarding = True
             Events(4) = True
+            Events(7) = False
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.Guard Then
             AA.isGuarding = False
+            Events(4) = False
         ElseIf e.KeyCode = Keys.S And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isShooting = True
         ElseIf e.KeyCode = Keys.Space And AA.CurrState = StateArmoredArmadillo.StandArmored Then
