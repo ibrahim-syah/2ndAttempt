@@ -227,7 +227,7 @@ Public Class CCharArmoredArmadillo
             Events(5) = True
             State(StateArmoredArmadillo.StaggeredArmored, 5)
         End If
-        If PosX <= MMHitbox.Right And PosX >= MMHitbox.Left And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Not Events(3) Then
+        If MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) Then
             Events(6) = True
         End If
         Select Case CurrState
@@ -707,6 +707,7 @@ Public Class CCharMegaman
 
                 If FrameIdx = 7 And CurrFrame = 1 Then
                     Events(3) = False
+                    Events(6) = False 'fixes the bug that staggered mm at start
                     State(StateMegaman.Stand, 7)
                 End If
                 GetNextFrame()
