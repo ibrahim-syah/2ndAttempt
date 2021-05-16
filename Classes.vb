@@ -709,6 +709,7 @@ Public Class CCharMegaman
 
                 If FrameIdx = 7 And CurrFrame = 1 Then
                     Events(3) = False
+                    Events(1) = False 'fixes the bug that kill mm at start
                     Events(6) = False 'fixes the bug that staggered mm at start
                     State(StateMegaman.Stand, 7)
                 End If

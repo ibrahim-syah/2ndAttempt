@@ -39,13 +39,19 @@ Public Class Form1
         ' Initialize the random-number generator.
         'Randomize()
 
+        Dim path As String = My.Application.Info.DirectoryPath
+
         Bg = New CImage
-        Bg.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\scenery.bmp")
+        Dim bgFilePath As String = IO.Path.Combine(path, "scenery.bmp") 'use relative path from the exe file
+        'Bg.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\scenery.bmp")
+        Bg.OpenImage(bgFilePath)
 
         Bg.CopyImg(Img)
 
         SpriteMap = New CImage
-        SpriteMap.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\chara.bmp")
+        Dim charaFilePath As String = IO.Path.Combine(path, "chara.bmp") 'use relative path from the exe file
+        'SpriteMap.OpenImage("C:\Dev\visual-studio-vb\2ndAttempt\chara.bmp")
+        SpriteMap.OpenImage(charaFilePath)
 
         SpriteMap.CreateMask(SpriteMask)
 
