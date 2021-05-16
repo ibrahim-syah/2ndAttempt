@@ -159,7 +159,7 @@ Public Class Form1
 
         ListChar.Add(AA)
 
-        'clean this up
+        
         Events(0) = False 'is AA getting hit?
         Events(1) = False 'is MM getting hit by projectile or roll?
         Events(2) = False 'is MM alive?
