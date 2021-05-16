@@ -619,10 +619,10 @@ Public Class Form1
 
     Private Sub ArmoredArmadillo_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Left And AA.CurrState = StateArmoredArmadillo.StandArmored Then
-            AA.isWalking = True
+            'AA.isWalking = True
             AA.FDir = FaceDir.Left
         ElseIf e.KeyCode = Keys.Right And AA.CurrState = StateArmoredArmadillo.StandArmored Then
-            AA.isWalking = True
+            'AA.isWalking = True
             AA.FDir = FaceDir.Right
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isGuarding = True

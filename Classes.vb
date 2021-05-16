@@ -233,44 +233,44 @@ Public Class CCharArmoredArmadillo
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
                 GetNextFrame()
-                If isWalking Then
-                    State(StateArmoredArmadillo.WalkDebug, 1)
-                ElseIf isGuarding Then
+                'If isWalking Then
+                '    State(StateArmoredArmadillo.WalkDebug, 1)
+                If isGuarding Then
                     State(StateArmoredArmadillo.Guard, 3)
                 ElseIf isShooting Then
                     State(StateArmoredArmadillo.ShootArmored, 4)
                 ElseIf isInRollingAnimation Then
                     State(StateArmoredArmadillo.JumpStartArmored, 6)
                 End If
-            Case StateArmoredArmadillo.WalkDebug
-                PosX = PosX + Vx
-                If FDir = FaceDir.Left And isWalking = True Then
-                    Vx = -5
-                    PosX = PosX + Vx
-                    If AAHitbox.Left <= 22 Then
-                        Vx *= -1
-                        FDir = FaceDir.Right
-                    End If
+            'Case StateArmoredArmadillo.WalkDebug
+            '    PosX = PosX + Vx
+            '    If FDir = FaceDir.Left And isWalking = True Then
+            '        Vx = -5
+            '        PosX = PosX + Vx
+            '        If AAHitbox.Left <= 22 Then
+            '            Vx *= -1
+            '            FDir = FaceDir.Right
+            '        End If
 
-                ElseIf FDir = FaceDir.Right And isWalking = True Then
-                    Vx = 5
-                    PosX = PosX + Vx
-                    If AAHitbox.Right >= 323 Then
-                        Vx *= -1
-                        FDir = FaceDir.Left
-                    End If
-                End If
-                ' stopping walk
-                'stopping left
-                If FrameIdx = 0 And PosX >= PosX + Vx Then
-                    isWalking = False
-                    State(StateArmoredArmadillo.StandArmored, 0)
-                    'stopping right
-                ElseIf CurrFrame = 0 And PosX <= PosX + Vx Then
-                    isWalking = False
-                    State(StateArmoredArmadillo.StandArmored, 0)
-                End If
-                GetNextFrame()
+            '    ElseIf FDir = FaceDir.Right And isWalking = True Then
+            '        Vx = 5
+            '        PosX = PosX + Vx
+            '        If AAHitbox.Right >= 323 Then
+            '            Vx *= -1
+            '            FDir = FaceDir.Left
+            '        End If
+            '    End If
+            '    ' stopping walk
+            '    'stopping left
+            '    If FrameIdx = 0 And PosX >= PosX + Vx Then
+            '        isWalking = False
+            '        State(StateArmoredArmadillo.StandArmored, 0)
+            '        'stopping right
+            '    ElseIf CurrFrame = 0 And PosX <= PosX + Vx Then
+            '        isWalking = False
+            '        State(StateArmoredArmadillo.StandArmored, 0)
+            '    End If
+            '    GetNextFrame()
             Case StateArmoredArmadillo.IntroAnimation
                 GetNextFrame()
                 If CurrFrame = 4 And FrameIdx = 6 Then
