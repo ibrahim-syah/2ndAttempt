@@ -487,7 +487,6 @@ Public Class CCharArmoredArmadillo
                     PosY = 249
                     Vy = -12
                     Vx = 0
-                    Events(6) = False
                     State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                 End If
 
@@ -564,6 +563,9 @@ Public Class CCharArmoredArmadillo
 
             Case StateArmoredArmadillo.RollingRecoveryArmored
                 GetNextFrame()
+                If FrameIdx = 4 Then
+                    Events(6) = False
+                End If
                 If FrameIdx = 6 Then
                     State(StateArmoredArmadillo.RollingRecoveryEndArmored, 11)
                 End If
