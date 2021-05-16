@@ -160,7 +160,7 @@ Public Class Form1
         Events(3) = False 'is MM invincible (collision will not be registered)?
         Events(4) = False 'is AA guarding/rolling (projectile will be deflected)?
         Events(5) = True 'is AA invincible (collision will not be registered)?
-        Events(6) = False 'is MM staggered by AA's body?
+        Events(6) = False 'is AA in rolling animation?
         Events(7) = False 'is AA deflecting projectile?
 
         'initialize sprites for Sprite Projectiles

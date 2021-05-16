@@ -227,9 +227,6 @@ Public Class CCharArmoredArmadillo
             Events(5) = True
             State(StateArmoredArmadillo.StaggeredArmored, 5)
         End If
-        If MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) Then
-            Events(6) = True
-        End If
         Select Case CurrState
             Case StateArmoredArmadillo.StandArmored
                 GetNextFrame()
@@ -347,6 +344,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
                 If AAHitbox.Bottom >= 255 And Vy > 0 Then
                     Events(4) = True
+                    Events(6) = True
                     Vy = 0
                     State(StateArmoredArmadillo.Rolling, 9)
                     PosY = 238
@@ -492,6 +490,7 @@ Public Class CCharArmoredArmadillo
                     Vy = -12
                     Vx = 0
                     Events(4) = False
+                    Events(6) = False
                     State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                 End If
 
@@ -688,8 +687,7 @@ Public Class CCharMegaman
                 FDir = FaceDir.Left
             End If
             State(StateMegaman.Die, 3)
-            Events(6) = False 'rolling towards mm technically triggers this event as well
-        ElseIf Events(6) And Not Events(3) Then
+        ElseIf MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) And Not Events(6) Then
             If AAHitbox.CtrPoint.x > MMHitbox.CtrPoint.x Then
                 'bodied from the right
                 Vx = -5
@@ -772,7 +770,6 @@ Public Class CCharMegaman
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 If FrameIdx = 0 And CurrFrame = 7 And MMHitbox.Bottom >= 255 Then
-                    Events(6) = False
                     Events(3) = False
                     Vx = 0
                     PosY = 238
