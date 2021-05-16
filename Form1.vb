@@ -158,7 +158,7 @@ Public Class Form1
         Events(1) = False 'is MM getting hit by projectile or roll?
         Events(2) = False 'is MM alive?
         Events(3) = False 'is MM invincible (collision will not be registered)?
-        Events(4) = False 'is AA guarding/rolling (projectile will be deflected)?
+        Events(4) = False 'is AA guarding?
         Events(5) = True 'is AA invincible (collision will not be registered)?
         Events(6) = False 'is AA in rolling animation?
         Events(7) = False 'is AA deflecting projectile?
@@ -625,11 +625,9 @@ Public Class Form1
             'AA.isWalking = True
             AA.FDir = FaceDir.Right
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.StandArmored Then
-            AA.isGuarding = True
             Events(4) = True
             Events(7) = False
         ElseIf e.KeyCode = Keys.Down And AA.CurrState = StateArmoredArmadillo.Guard Then
-            AA.isGuarding = False
             Events(4) = False
         ElseIf e.KeyCode = Keys.S And AA.CurrState = StateArmoredArmadillo.StandArmored Then
             AA.isShooting = True

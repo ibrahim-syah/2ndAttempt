@@ -194,7 +194,6 @@ Public Class CCharArmoredArmadillo
     Inherits CCharacter
 
     Public isWalking As Boolean = False
-    Public isGuarding As Boolean = False
     Public isShooting As Boolean = False
     Public isInRollingAnimation As Boolean = False
     Public isIntro As Boolean = True
@@ -232,7 +231,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
                 'If isWalking Then
                 '    State(StateArmoredArmadillo.WalkDebug, 1)
-                If isGuarding Then
+                If Events(4) Then
                     State(StateArmoredArmadillo.Guard, 3)
                 ElseIf isShooting Then
                     State(StateArmoredArmadillo.ShootArmored, 4)
@@ -283,7 +282,7 @@ Public Class CCharArmoredArmadillo
                 GetNextFrame()
 
             Case StateArmoredArmadillo.Guard
-                If isGuarding = False Then
+                If Events(4) = False Then
                     State(StateArmoredArmadillo.StandArmored, 0)
                 End If
                 If Events(7) Then
@@ -295,7 +294,6 @@ Public Class CCharArmoredArmadillo
                 If FrameIdx = 9 And CurrFrame = 4 Then
                     State(StateArmoredArmadillo.StandArmored, 0)
                     Events(4) = False
-                    isGuarding = False
                     Events(7) = False
                 End If
                 GetNextFrame()
@@ -319,6 +317,7 @@ Public Class CCharArmoredArmadillo
                 If FrameIdx = 5 And CurrFrame = 1 And AAHitbox.Bottom >= 255 Then
                     Events(0) = False
                     Events(5) = False
+                    Events(4) = False
                     State(StateArmoredArmadillo.StandArmored, 0)
                 End If
                 GetNextFrame()
@@ -343,7 +342,6 @@ Public Class CCharArmoredArmadillo
                 Vy = Vy + gravity
                 GetNextFrame()
                 If AAHitbox.Bottom >= 255 And Vy > 0 Then
-                    Events(4) = True
                     Events(6) = True
                     Vy = 0
                     State(StateArmoredArmadillo.Rolling, 9)
@@ -489,7 +487,6 @@ Public Class CCharArmoredArmadillo
                     PosY = 249
                     Vy = -12
                     Vx = 0
-                    Events(4) = False
                     Events(6) = False
                     State(StateArmoredArmadillo.RollingRecoveryArmored, 10)
                 End If
@@ -871,7 +868,23 @@ Public Class CCharMegamanProjectile
                 PosX = PosX + Vx
                 PosY = PosY + Vy
                 If PosX >= AAHitbox.Left And PosX <= AAHitbox.Right And PosY >= AAHitbox.Top And PosY <= AAHitbox.Bottom And Not Events(5) Then
-                    If Events(4) = True Then
+                    If Events(6) Then 'if aa is rolling, automatically deflect
+                        Dim rnd As New Random
+                        ' Generate random value between the two angle
+                        Dim RandomizedAngle As Integer = rnd.Next(30, 60 + 1)
+                        Dim RandomizedDir As Double = rnd.NextDouble()
+                        Dim Velocity As Double() = FindComponentVector(RandomizedAngle, Vx)
+                        Vy = Velocity(1)
+                        Vx = Vx * -1
+                        If RandomizedDir >= 0.5 Then
+                            Vy = Vy * -1
+                        End If
+                        If FDir = FaceDir.Left Then
+                            FDir = FaceDir.Right
+                        Else
+                            FDir = FaceDir.Left
+                        End If
+                    ElseIf Events(4) And ((Vx < 0 And AAHitbox.FDir = FaceDir.Right) Or (Vx > 0 And AAHitbox.FDir = FaceDir.Left)) Then 'will only deflect if facing towards the incoming projectile
                         Dim rnd As New Random
                         ' Generate random value between the two angle
                         Dim RandomizedAngle As Integer = rnd.Next(30, 60 + 1)
@@ -940,6 +953,7 @@ Public Class HitboxClass
     Public CtrPoint As TPoint
     Public Top, Bottom, Left, Right As Integer
     Public relativeDistance(4) As Integer
+    Public FDir As FaceDir
 
     Public Sub UpdateHitbox(ByRef character As CCharacter)
         Dim CurrSprite As CElmtFrame = character.ArrSprites(character.IdxArrSprites).Elmt(character.FrameIdx)
@@ -947,6 +961,7 @@ Public Class HitboxClass
 
         CtrPoint.x = character.PosX
         CtrPoint.y = character.PosY
+        FDir = character.FDir
 
         Top = character.PosY - relativeDistance(1)
         Bottom = character.PosY + relativeDistance(3)
