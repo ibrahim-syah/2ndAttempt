@@ -356,9 +356,14 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.Rolling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
-                    Events(1) = True 'MM is hit
+                'If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
+                '    Events(1) = True 'MM is hit
+                'End If
+
+                If AAHitbox.Left <= MMHitbox.Right And MMHitbox.Left <= AAHitbox.Right And AAHitbox.Top <= MMHitbox.Bottom And MMHitbox.Top <= AAHitbox.Bottom And Not Events(3) Then
+                    Events(1) = True ''MM is hit
                 End If
+
                 If isIntro Then
                     PosY = PosY + Vy
                     Vy = Vy + gravity
@@ -480,8 +485,8 @@ Public Class CCharArmoredArmadillo
             Case StateArmoredArmadillo.FreeFalling
                 Dim rnd As New Random()
                 GetNextFrame()
-                If PosX >= MMHitbox.Left And PosX <= MMHitbox.Right And PosY >= MMHitbox.Top And PosY <= MMHitbox.Bottom And Events(3) = False Then
-                    Events(1) = True 'MM is hit
+                If AAHitbox.Left <= MMHitbox.Right And MMHitbox.Left <= AAHitbox.Right And AAHitbox.Top <= MMHitbox.Bottom And MMHitbox.Top <= AAHitbox.Bottom And Not Events(3) Then
+                    Events(1) = True ''MM is hit
                 End If
                 If AAHitbox.Bottom >= 255 Then
                     PosY = 249
@@ -597,7 +602,6 @@ End Class
 
 Public Class CCharArmoredArmadilloProjectile
     Inherits CCharacter
-
     Public CurrState As StateArmoredArmadilloProjectile
 
     Public Sub State(state As StateArmoredArmadilloProjectile, idxspr As Integer)
@@ -686,7 +690,8 @@ Public Class CCharMegaman
                 FDir = FaceDir.Left
             End If
             State(StateMegaman.Die, 3)
-        ElseIf MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) And Not Events(6) Then
+        ElseIf AAHitbox.Left <= MMHitbox.Right And MMHitbox.Left <= AAHitbox.Right And AAHitbox.Top <= MMHitbox.Bottom And MMHitbox.Top <= AAHitbox.Bottom And Not Events(3) And Not Events(6) Then
+            'ElseIf MMHitbox.CtrPoint.x <= AAHitbox.Right And MMHitbox.CtrPoint.x >= AAHitbox.Left And MMHitbox.CtrPoint.y >= AAHitbox.Top And MMHitbox.CtrPoint.y <= AAHitbox.Bottom And Not Events(3) And Not Events(6) Then
             If AAHitbox.CtrPoint.x > MMHitbox.CtrPoint.x Then
                 'bodied from the right
                 Vx = -5
